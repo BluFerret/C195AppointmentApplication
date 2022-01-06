@@ -1,6 +1,34 @@
 package Controller;
 
-public class ApplicationMain {
+import DAO.JDBC;
+import Model.Appointment;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
+
+public class ApplicationMain implements Initializable {
+    @FXML private Label errorMessage;
+    @FXML private ToggleGroup AppointmentTab;
+    @FXML private TableView<Appointment> appointmentTableView;
+    @FXML private TableColumn<Appointment,Integer> cAppID;
+    @FXML private TableColumn<Appointment,String> cAppTitle;
+    @FXML private TableColumn<Appointment,String> cAppDesc;
+    @FXML private TableColumn<Appointment,String> cAppLoc;
+    @FXML private TableColumn<Appointment,String> cAppContact;
+    @FXML private TableColumn<Appointment,String> cAppType;
+    @FXML private TableColumn<Appointment,String> cAppStartDT;
+    @FXML private TableColumn<Appointment,String> cAppEndDT;
+    @FXML private TableColumn<Appointment,Integer> cAppCustomerID;
+    @FXML private TableColumn<Appointment,Integer> cAppUserID;
+    public ObservableList<Appointment> appointmentList;
+    //public ObservableList<Contact> contactList;
+
     // TODO: Customer records and appointments can be added, updated, and deleted. When deleting a customer record,
     //  all of the customer’s appointments must be deleted first, due to foreign key constraints.
     // TODO: When adding and updating a customer, text fields are used to collect the following data: customer name,
@@ -49,4 +77,47 @@ public class ApplicationMain {
     //    TODO: Write code that provides the ability to track user activity by recording all user log-in attempts,
     //     dates, and time stamps and whether each attempt was successful in a file named login_activity.txt. Append
     //     each new record to the existing file, and save to the root folder of the application.
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        try {
+            updateAppointmentList();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            displayError("SQL error");
+        }
+        cAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
+        cAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
+        cAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
+        cAppLoc.setCellValueFactory(new PropertyValueFactory<>("appLocation"));
+        cAppContact.setCellValueFactory(new PropertyValueFactory<>("appContact"));
+        cAppType.setCellValueFactory(new PropertyValueFactory<>("appType"));
+        cAppStartDT.setCellValueFactory(new PropertyValueFactory<>("appStartDateTime"));
+        cAppEndDT.setCellValueFactory(new PropertyValueFactory<>("appEndDateTime"));
+        cAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
+        cAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
+        if(appointmentList.isEmpty()){displayError("No appointments to display");}
+        appointmentTableView.setItems(appointmentList);
+    }
+
+    private void updateAppointmentList() throws SQLException {
+        appointmentList = JDBC.listOfAppointments();
+    }
+
+    /**
+     * Method to display error message to user. Error message initially set to be invisible and becomes visible once
+     * an error is shown to the user for the first time on the screen.
+     * @param s- String containing error message to be displayed to the user.
+     */
+    private void displayError(String s){
+        errorMessage.setText(s);
+        errorMessage.setVisible(true);
+    }
+    /**
+     * This method is called when the exit button is clicked. This closes the connection to the database and exits the program.
+     */
+    public void exitButtonAction() {
+        JDBC.closeConnection();
+        System.exit(0);
+    }
 }
