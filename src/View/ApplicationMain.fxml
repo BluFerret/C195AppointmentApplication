@@ -11,96 +11,156 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="637.0" prefWidth="1229.0" xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ApplicationMain">
+<AnchorPane prefHeight="637.0" prefWidth="1229.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ApplicationMain">
    <TabPane layoutY="66.0" prefHeight="522.0" prefWidth="1229.0" tabClosingPolicy="UNAVAILABLE">
-      <Tab text="   Appointments   ">
-         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-            <TableView fx:id="appointmentTableView" layoutX="23.0" layoutY="121.0" prefHeight="358.0"
-                       prefWidth="1182.0">
+      <Tab text="   User Dashboard   ">
+         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
+            <TableView fx:id="dashAppointmentTableView" layoutX="23.0" layoutY="121.0" prefHeight="358.0" prefWidth="1182.0">
                <columns>
-                  <TableColumn fx:id="cAppID" prefWidth="39.99999809265137" text="ID"/>
-                  <TableColumn fx:id="cAppTitle" prefWidth="103.19999694824219" text="Title"/>
-                  <TableColumn fx:id="cAppDesc" prefWidth="185.60000610351562" text="Description"/>
-                  <TableColumn fx:id="cAppLoc" prefWidth="147.20001220703125" text="Location"/>
-                  <TableColumn fx:id="cAppContact" prefWidth="117.5999755859375" text="Contact"/>
-                  <TableColumn fx:id="cAppType" prefWidth="111.20001220703125" text="Type"/>
-                  <TableColumn fx:id="cAppStartDT" prefWidth="166.4000244140625" text="Start Date/Time"/>
-                  <TableColumn fx:id="cAppEndDT" prefWidth="171.199951171875" text="End Date/Time"/>
-                  <TableColumn fx:id="cAppCustomerID" prefWidth="78.39996337890625" text="Customer ID"/>
-                  <TableColumn fx:id="cAppUserID" prefWidth="65.5999755859375" text="User ID"/>
+                  <TableColumn fx:id="dAppID" prefWidth="39.99999809265137" text="ID" />
+                  <TableColumn fx:id="dAppTitle" prefWidth="86.39999389648438" text="Title" />
+                  <TableColumn fx:id="dAppDesc" prefWidth="127.99998474121094" text="Description" />
+                  <TableColumn fx:id="dAppLoc" prefWidth="145.5999755859375" text="Location" />
+                  <TableColumn fx:id="dAppContact" prefWidth="139.20001220703125" text="Contact" />
+                  <TableColumn fx:id="dAppType" prefWidth="117.5999755859375" text="Type" />
+                  <TableColumn fx:id="dAppStartDT" prefWidth="168.0" text="Start Date/Time" />
+                  <TableColumn fx:id="dAppEndDT" prefWidth="165.59991455078125" text="End Date/Time" />
+                  <TableColumn fx:id="dAppCustomerID" prefWidth="94.4000244140625" text="Customer ID" />
+                  <TableColumn fx:id="dAppUserID" prefWidth="94.4000244140625" text="User ID" />
                </columns>
             </TableView>
-            <RadioButton layoutX="418.0" layoutY="29.0" mnemonicParsing="false" text="Current Week"
-                         textFill="#0c7604">
+            <Label fx:id="dashUsername" contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="390.0" text="Appointments for &lt;username&gt;" textAlignment="CENTER" textFill="#0c7604">
                <font>
-                  <Font name="System Bold" size="12.0"/>
-               </font>
-               <toggleGroup>
-                  <ToggleGroup fx:id="AppointmentTab"/>
-               </toggleGroup>
-            </RadioButton>
-            <RadioButton layoutX="568.0" layoutY="29.0" mnemonicParsing="false" text="Current Month"
-                         textFill="#0c7604" toggleGroup="$AppointmentTab">
-               <font>
-                  <Font name="System Bold" size="12.0"/>
-               </font>
-            </RadioButton>
-            <RadioButton layoutX="268.0" layoutY="29.0" mnemonicParsing="false" selected="true" text="All Time"
-                         textFill="#0c7604" toggleGroup="$AppointmentTab">
-               <font>
-                  <Font name="System Bold" size="12.0"/>
-               </font>
-            </RadioButton>
-            <Label contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="390.0"
-                   text="Appointments" textAlignment="CENTER" textFill="#0c7604">
-               <font>
-                  <Font name="System Bold" size="18.0"/>
+                  <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <Button layoutX="799.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0"
-                    text="Delete" textFill="#0c7604">
+            <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
                <font>
-                  <Font name="System Bold" size="14.0"/>
-               </font>
-            </Button>
-            <Button layoutX="698.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0"
-                    text="Modify" textFill="#0c7604">
-               <font>
-                  <Font name="System Bold" size="14.0"/>
-               </font>
-            </Button>
-            <Button layoutX="596.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0"
-                    text="Add" textFill="#0c7604">
-               <font>
-                  <Font name="System Bold" size="14.0"/>
+                  <Font name="System Bold" size="14.0" />
                </font>
             </Button>
          </AnchorPane>
       </Tab>
+      <Tab text="   Appointments   ">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
+               <children>
+                  <TableView fx:id="appointmentTableView" layoutX="23.0" layoutY="121.0" prefHeight="358.0" prefWidth="1182.0">
+                     <columns>
+                        <TableColumn fx:id="cAppID" prefWidth="39.99999809265137" text="ID" />
+                        <TableColumn fx:id="cAppTitle" prefWidth="86.39999389648438" text="Title" />
+                        <TableColumn fx:id="cAppDesc" prefWidth="127.99998474121094" text="Description" />
+                        <TableColumn fx:id="cAppLoc" prefWidth="145.5999755859375" text="Location" />
+                        <TableColumn fx:id="cAppContact" prefWidth="139.20001220703125" text="Contact" />
+                        <TableColumn fx:id="cAppType" prefWidth="117.5999755859375" text="Type" />
+                        <TableColumn fx:id="cAppStartDT" prefWidth="168.0" text="Start Date/Time" />
+                        <TableColumn fx:id="cAppEndDT" prefWidth="165.59991455078125" text="End Date/Time" />
+                        <TableColumn fx:id="cAppCustomerID" prefWidth="94.4000244140625" text="Customer ID" />
+                        <TableColumn fx:id="cAppUserID" prefWidth="94.4000244140625" text="User ID" />
+                     </columns>
+                  </TableView>
+                  <RadioButton layoutX="555.0" layoutY="29.0" mnemonicParsing="false" text="Current Week" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="AppointmentTab1" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton layoutX="705.0" layoutY="29.0" mnemonicParsing="false" text="Current Month" textFill="#0c7604" toggleGroup="$AppointmentTab1">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </RadioButton>
+                  <RadioButton layoutX="405.0" layoutY="29.0" mnemonicParsing="false" selected="true" text="All Time" textFill="#0c7604" toggleGroup="$AppointmentTab1">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </RadioButton>
+                  <Label contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="390.0" text="Appointments" textAlignment="CENTER" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button layoutX="1016.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Modify" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button layoutX="914.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Add" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="   Customers   ">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
+               <children>
+                  <TableView fx:id="customerTableView" layoutX="23.0" layoutY="121.0" prefHeight="358.0" prefWidth="1182.0">
+                     <columns>
+                        <TableColumn fx:id="custID" prefWidth="39.99999809265137" text="ID" />
+                        <TableColumn fx:id="custName" prefWidth="125.60000610351562" text="Name" />
+                        <TableColumn fx:id="custPhone" prefWidth="138.40000915527344" text="Phone" />
+                        <TableColumn fx:id="custAddress" prefWidth="272.8000183105469" text="Address" />
+                        <TableColumn fx:id="custZip" prefWidth="109.5999755859375" text="Zipcode" />
+                        <TableColumn fx:id="custDiv" prefWidth="160.0" text="Divison" />
+                        <TableColumn fx:id="custDivID" prefWidth="125.60003662109375" text="Division ID" />
+                        <TableColumn fx:id="custCountry" prefWidth="112.0" text="Country" />
+                        <TableColumn fx:id="custCountryID" prefWidth="100.800048828125" text="Country ID" />
+                     </columns>
+                  </TableView>
+                  <Label contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="390.0" text="Customers" textAlignment="CENTER" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button layoutX="1016.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Modify" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button layoutX="914.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Add" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
    </TabPane>
-   <Label alignment="CENTER" layoutX="3.0" layoutY="11.0" prefHeight="38.0" prefWidth="323.0"
-          text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER" layoutX="3.0" layoutY="11.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
       <font>
-         <Font name="System Bold" size="18.0"/>
+         <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <Button layoutX="830.0" layoutY="594.0" mnemonicParsing="false" onAction="#exitButtonAction" text="Exit"
-           textFill="#0c7604">
+   <Button layoutX="1157.0" layoutY="592.0" mnemonicParsing="false" onAction="#exitButtonAction" text="Exit" textFill="#0c7604">
       <font>
-         <Font name="System Bold" size="14.0"/>
+         <Font name="System Bold" size="14.0" />
       </font>
    </Button>
-   <Label fx:id="errorMessage" alignment="CENTER" layoutX="330.0" layoutY="11.0" prefHeight="38.0" prefWidth="562.0"
-          text="Error Message" textAlignment="CENTER" textFill="#ea1a0b" visible="false">
+   <Label fx:id="errorMessage" alignment="CENTER" layoutX="330.0" layoutY="11.0" prefHeight="38.0" prefWidth="562.0" text="Error Message" textAlignment="CENTER" textFill="#ea1a0b" visible="false">
       <font>
-         <Font name="System Bold" size="14.0"/>
+         <Font name="System Bold" size="14.0" />
       </font>
    </Label>
-   <Label alignment="CENTER" layoutX="14.0" layoutY="588.0" prefHeight="38.0" prefWidth="506.0"
-          text="Double click on any record for more information." textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER" layoutX="14.0" layoutY="588.0" prefHeight="38.0" prefWidth="506.0" text="Double click on any record for more information." textAlignment="CENTER" textFill="#0c7604">
       <font>
-         <Font name="System Bold" size="18.0"/>
+         <Font name="System Bold" size="18.0" />
       </font>
    </Label>
 </AnchorPane>

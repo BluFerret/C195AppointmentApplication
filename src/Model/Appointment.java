@@ -1,7 +1,7 @@
 package Model;
 
 public class Appointment {
-    private int appID; // appointment ID - Appointment_ID INT(10) (PK)
+    private final int appID; // appointment ID - Appointment_ID INT(10) (PK)
     private String appTitle; // appointment title - Title VARCHAR(50)
     private String appDesc; // appointment description - Description VARCHAR(50)
     private String appLocation; // appointment location - Location VARCHAR(50)
@@ -12,14 +12,16 @@ public class Appointment {
     private int appUserID; // appointment user ID - User_ID INT(10) (FK)
     private String appContact; // appointment contact name - CONTACTS TABLE Contact_Name VARCHAR(50) joined on Contact_ID INT(10)
 
-    public Appointment(int appID, String appTitle, String appDesc, String appLocation, String appType, String appStartDateTime, String appEndDateTime, int appCustomerID, int appUserID, String appContact) {
+    public Appointment(int appID, String appTitle, String appDesc, String appLocation, String appType,
+                       String appStartDateTime, String appEndDateTime, int appCustomerID, int appUserID,
+                       String appContact) {
         this.appID = appID;
         this.appTitle = appTitle;
         this.appDesc = appDesc;
         this.appLocation = appLocation;
         this.appType = appType;
-        this.appStartDateTime = appStartDateTime;
-        this.appEndDateTime = appEndDateTime;
+        this.appStartDateTime = SessionData.convertUTCtoLocal(appStartDateTime);
+        this.appEndDateTime = SessionData.convertUTCtoLocal(appEndDateTime);
         this.appCustomerID = appCustomerID;
         this.appUserID = appUserID;
         this.appContact = appContact;
@@ -27,10 +29,6 @@ public class Appointment {
 
     public int getAppID() {
         return appID;
-    }
-
-    public void setAppID(int appID) {
-        this.appID = appID;
     }
 
     public String getAppTitle() {

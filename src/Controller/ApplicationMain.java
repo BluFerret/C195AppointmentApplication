@@ -2,6 +2,8 @@ package Controller;
 
 import DAO.JDBC;
 import Model.Appointment;
+import Model.Customer;
+import Model.SessionData;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,6 +16,7 @@ import java.util.ResourceBundle;
 
 public class ApplicationMain implements Initializable {
     @FXML private Label errorMessage;
+    @FXML private Label dashUsername;
     @FXML private ToggleGroup AppointmentTab;
     @FXML private TableView<Appointment> appointmentTableView;
     @FXML private TableColumn<Appointment,Integer> cAppID;
@@ -27,7 +30,29 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,Integer> cAppCustomerID;
     @FXML private TableColumn<Appointment,Integer> cAppUserID;
     public ObservableList<Appointment> appointmentList;
-    //public ObservableList<Contact> contactList;
+    @FXML private TableView<Appointment> dashAppointmentTableView;
+    @FXML private TableColumn<Appointment,Integer> dAppID;
+    @FXML private TableColumn<Appointment,String> dAppTitle;
+    @FXML private TableColumn<Appointment,String> dAppDesc;
+    @FXML private TableColumn<Appointment,String> dAppLoc;
+    @FXML private TableColumn<Appointment,String> dAppContact;
+    @FXML private TableColumn<Appointment,String> dAppType;
+    @FXML private TableColumn<Appointment,String> dAppStartDT;
+    @FXML private TableColumn<Appointment,String> dAppEndDT;
+    @FXML private TableColumn<Appointment,Integer> dAppCustomerID;
+    @FXML private TableColumn<Appointment,Integer> dAppUserID;
+    public ObservableList<Appointment> dashAppointmentList;
+    @FXML private TableView<Customer> customerTableView;
+    @FXML private TableColumn<Customer,Integer> custID;
+    @FXML private TableColumn<Customer,String> custName;
+    @FXML private TableColumn<Customer,String> custPhone;
+    @FXML private TableColumn<Customer,String> custAddress;
+    @FXML private TableColumn<Customer,String> custZip;
+    @FXML private TableColumn<Customer,String> custDiv;
+    @FXML private TableColumn<Customer,Integer> custDivID;
+    @FXML private TableColumn<Customer,String> custCountry;
+    @FXML private TableColumn<Customer,Integer> custCountryID;
+    public ObservableList<Customer> customerList;
 
     // TODO: Customer records and appointments can be added, updated, and deleted. When deleting a customer record,
     //  all of the customer’s appointments must be deleted first, due to foreign key constraints.
@@ -37,10 +62,6 @@ public class ApplicationMain implements Initializable {
     // TODO: Country and first-level division data is pre-populated in separate combo boxes or lists in the user
     //  interface for the user to choose. The first-level list should be filtered by the user’s selection of a
     //  country (e.g., when choosing U.S., filter so it only shows states).
-    // TODO: All of the original customer information is displayed on the update form. All of the fields can be
-    //  updated except for Customer_ID. Customer data is displayed using a TableView, including first-level division
-    //  data. A list of all the customers and their information may be viewed in a TableView, and updates of the data
-    //  can be performed in text fields on the form.
     //  TODO: When a customer record is deleted, a custom message should display in the user interface.
     //  TODO: Write code that enables the user to add, update, and delete appointments. A contact name is assigned to
     //   an appointment using a drop-down menu or combo box. A custom message is displayed in the user interface with
@@ -81,12 +102,27 @@ public class ApplicationMain implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            updateAppointmentList();
+            updateAppointmentLists();
+            updateCustomerList();
+            System.out.println("lists updated");
         } catch (SQLException e) {
             e.printStackTrace();
             displayError("SQL error");
         }
-        cAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
+        setDashUsername(); // sets message on dash to display username
+        System.out.println("dash label set");
+        dAppID.setCellValueFactory(new PropertyValueFactory<>("appID")); // dash appointment table for user
+        dAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
+        dAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
+        dAppLoc.setCellValueFactory(new PropertyValueFactory<>("appLocation"));
+        dAppContact.setCellValueFactory(new PropertyValueFactory<>("appContact"));
+        dAppType.setCellValueFactory(new PropertyValueFactory<>("appType"));
+        dAppStartDT.setCellValueFactory(new PropertyValueFactory<>("appStartDateTime"));
+        dAppEndDT.setCellValueFactory(new PropertyValueFactory<>("appEndDateTime"));
+        dAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
+        dAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
+        dashAppointmentTableView.setItems(dashAppointmentList);
+        cAppID.setCellValueFactory(new PropertyValueFactory<>("appID")); // appointment table
         cAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
         cAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
         cAppLoc.setCellValueFactory(new PropertyValueFactory<>("appLocation"));
@@ -98,10 +134,27 @@ public class ApplicationMain implements Initializable {
         cAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
         if(appointmentList.isEmpty()){displayError("No appointments to display");}
         appointmentTableView.setItems(appointmentList);
+        custID.setCellValueFactory(new PropertyValueFactory<>("cusID")); // customer table
+        custName.setCellValueFactory(new PropertyValueFactory<>("cusName"));
+        custPhone.setCellValueFactory(new PropertyValueFactory<>("cusPhone"));
+        custAddress.setCellValueFactory(new PropertyValueFactory<>("cusAddress"));
+        custZip.setCellValueFactory(new PropertyValueFactory<>("cusPostalCode"));
+        custDiv.setCellValueFactory(new PropertyValueFactory<>("cusDivision"));
+        custDivID.setCellValueFactory(new PropertyValueFactory<>("cusDivisionCode"));
+        custCountry.setCellValueFactory(new PropertyValueFactory<>("cusCountry"));
+        custCountryID.setCellValueFactory(new PropertyValueFactory<>("cusCountryCode"));
+        if(customerList.isEmpty()){displayError("No customers to display");}
+        customerTableView.setItems(customerList);
+
     }
 
-    private void updateAppointmentList() throws SQLException {
+    private void updateAppointmentLists() throws SQLException {
         appointmentList = JDBC.listOfAppointments();
+        dashAppointmentList = JDBC.listOfAppointments(SessionData.getUsername());
+    }
+
+    private void updateCustomerList() throws SQLException{
+        customerList = JDBC.listOfCustomers();
     }
 
     /**
@@ -119,5 +172,10 @@ public class ApplicationMain implements Initializable {
     public void exitButtonAction() {
         JDBC.closeConnection();
         System.exit(0);
+    }
+
+    private void setDashUsername(){
+        dashUsername.setText("Appointments for user: "+ SessionData.getUsername());
+        System.out.println(dashUsername.getText());
     }
 }
