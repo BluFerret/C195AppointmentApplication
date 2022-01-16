@@ -1,5 +1,7 @@
 package DAO;
 import Model.Appointment;
+import Model.Contact;
+import Model.Country;
 import Model.Customer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,7 +18,7 @@ public abstract class JDBC {
     private static final String accessUserName = "sqlUser";
     private static String accessPassword = "Passw0rd!";
     public static Connection conn;
-
+    // ========== Database ==========
     /**
      * Opens connection to the database using attributes locally saved in this class.
      */
@@ -63,6 +65,7 @@ public abstract class JDBC {
             return Objects.equals(temp, passwordAttempt);
         }
     }
+    // ========== Appointments ==========
     /**
      * This method queries a list of all appointments.
      * @return an observable list of appointments with the specifications of the query
@@ -137,6 +140,28 @@ public abstract class JDBC {
         }
         return true;
     }
+    /**
+     * This method executes a query to remove an appointment.
+     * @param appointmentID = The ID number of the appointment to be removed.
+     * @return - a boolean indicating whether or not the appointment was removed.
+     */
+    public static boolean deleteAppointment(int appointmentID){
+        try {
+            Statement statement = conn.createStatement() ;
+            String q = "DELETE FROM appointments WHERE Appointment_ID = "+appointmentID+";";
+            statement.executeQuery(q);}
+        catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+    // ========== Customers ==========
+    /**
+     * This method executes a query to pull a list of customers and their associated information.
+     * @return an ObservableList containing customers.
+     * @throws SQLException - from the SQL executeQuery of the statement via database connection
+     */
     public static ObservableList<Customer> listOfCustomers()throws SQLException {
         ObservableList<Customer> list = FXCollections.observableArrayList();
         Statement statement = conn.createStatement() ;
@@ -151,6 +176,44 @@ public abstract class JDBC {
                     rs.getString("Division"),rs.getInt("Division_ID"),
                     rs.getString("Country"),rs.getInt("Country_ID"),rs.getString("Phone"));
             list.add(customer);
+        }
+        return list;
+    }
+    /**
+     * This method executes a query to pull a list of all contacts and their IDs/
+     * @return an ObservableList containing all contacts and their IDs.
+     * @throws SQLException - from the SQL executeQuery of the statement via database connection
+     */
+    public static ObservableList<Contact> listOfContacts()throws SQLException{
+        ObservableList<Contact> list = FXCollections.observableArrayList();
+        Statement statement = conn.createStatement() ;
+        String q = "SELECT Contact_Name, Contact_ID FROM contacts;";
+        ResultSet rs = statement.executeQuery(q);
+        while(rs.next()){
+            Contact contact =  new Contact(rs.getString("Contact_Name"),rs.getInt("Contact_ID"));
+            list.add(contact);
+        }
+        return list;
+    }
+    public static ObservableList<Country> listOfCountries()throws SQLException{
+        ObservableList<Country> list = FXCollections.observableArrayList();
+        Statement statement = conn.createStatement() ;
+        String q = "SELECT Country, Country_ID from countries;";
+        ResultSet rs = statement.executeQuery(q);
+        while(rs.next()){
+            Country country =  new Country(rs.getString("Country"),rs.getInt("Country_ID"));
+            list.add(country);
+        }
+        return list;
+    }
+    public static ObservableList<Country> listOfFirstLvlDivisions()throws SQLException{
+        ObservableList<Country> list = FXCollections.observableArrayList();
+        Statement statement = conn.createStatement() ;
+        String q = "SELECT Country, Country_ID from countries;";
+        ResultSet rs = statement.executeQuery(q);
+        while(rs.next()){
+            Country country =  new Country(rs.getString("Country"),rs.getInt("Country_ID"));
+            list.add(country);
         }
         return list;
     }
