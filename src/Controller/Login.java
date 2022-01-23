@@ -22,16 +22,21 @@ public class Login {
     // TODO: Login displays the log-in form in English or French based on the user’s computer language setting
     //  to translate all the text, labels, buttons, and errors on the form. Note: Some operating systems
     //  require a reboot when changing the language settings.
-    // TODO: Login automatically translates error control messages into English or French based on the user’s
-    //  computer language setting. Note: Some operating systems require a reboot when changing the language settings.
 
+    /**
+     * This method attempts a login based on the information provided from the user. Error messages are
+     * displayed depending on if the user information provided is incomplete or does not match the login information
+     * in the database.
+     * @return = a boolean that shows if the provided login information matches the login information in the database
+     * @throws SQLException - from the SQL executeQuery of the statement via database connection
+     */
     private boolean loginValidation() throws SQLException {
         boolean loginAttempt = true;
         if(userNameText.getText().isEmpty() || passwordText.getText().isEmpty()){
-            displayError("Please enter a user name and password.");
+            displayError("Please enter a user name and password."); // if username or password are empty
             loginAttempt = false;}
         else if(!JDBC.validateUsernameAndPassword(userNameText.getText(),passwordText.getText())){
-            displayError("Username and/or password not valid, please try again.");
+            displayError("Username and/or password not valid, please try again."); // if username/password don't match database
             loginAttempt = false;
             }
         SessionData.recordLoginAttempt(userNameText.getText(),loginAttempt);

@@ -87,12 +87,12 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Button>
-                  <Button layoutX="1016.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Modify" textFill="#0c7604">
+                  <Button layoutX="1016.0" layoutY="68.0" mnemonicParsing="false" onAction="#updateAppointmentAction" prefHeight="30.0" prefWidth="85.0" text="Modify" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Button>
-                  <Button layoutX="914.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Add" textFill="#0c7604">
+                  <Button layoutX="914.0" layoutY="68.0" mnemonicParsing="false" onAction="#newAppointmentAction" prefHeight="30.0" prefWidth="85.0" text="Add" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -101,7 +101,7 @@
             </AnchorPane>
          </content>
       </Tab>
-      <Tab text="Customers">
+      <Tab text="   Customers   ">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
                <children>

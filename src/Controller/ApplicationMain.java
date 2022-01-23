@@ -5,14 +5,24 @@ import Model.Appointment;
 import Model.Customer;
 import Model.SessionData;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.ResourceBundle;
+
+import static DAO.JDBC.listOfAppointments;
 
 public class ApplicationMain implements Initializable {
     @FXML private Label errorMessage;
@@ -95,22 +105,18 @@ public class ApplicationMain implements Initializable {
     //     and time, and customer ID. an additional report of your choice that is different from the two other required
     //     reports in this prompt and from the user log-in date and time stamp that will be tracked in part C.
     //    TODO: Write at least two different lambda expressions to improve your code.
-    //    TODO: Write code that provides the ability to track user activity by recording all user log-in attempts,
-    //     dates, and time stamps and whether each attempt was successful in a file named login_activity.txt. Append
-    //     each new record to the existing file, and save to the root folder of the application.
+    //    TODO: track login attempts on txt file saved in root folder
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             updateAppointmentLists();
             updateCustomerList();
-            System.out.println("lists updated");
         } catch (SQLException e) {
             e.printStackTrace();
             displayError("SQL error");
         }
-        setDashUsername(); // sets message on dash to display username
-        System.out.println("dash label set");
+        dashUsername.setText("Appointments for user: "+ SessionData.getUsername());
         dAppID.setCellValueFactory(new PropertyValueFactory<>("appID")); // dash appointment table for user
         dAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
         dAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
@@ -149,12 +155,42 @@ public class ApplicationMain implements Initializable {
     }
 
     private void updateAppointmentLists() throws SQLException {
-        appointmentList = JDBC.listOfAppointments();
-        dashAppointmentList = JDBC.listOfAppointments(SessionData.getUsername());
+        appointmentList = listOfAppointments();
+        dashAppointmentList = listOfAppointments(SessionData.getUsername());
     }
 
+    /**
+     * updates the list of customers
+     * @throws SQLException - from the SQL executeQuery of the statement via database connection
+     */
     private void updateCustomerList() throws SQLException{
         customerList = JDBC.listOfCustomers();
+    }
+
+    public void updateAppointmentAction(ActionEvent e) {
+        try {
+            AppointmentView.setUpdateAppointment(appointmentTableView.getSelectionModel().getSelectedItem());
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../View/AppointmentView.fxml")));
+            Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        }
+        catch (IOException x) {
+            displayError("Something went wrong: Please select an appointment to modify and try again.");
+        }
+    }
+
+    public void newAppointmentAction(ActionEvent e){
+        try {
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../View/AppointmentView.fxml")));
+            Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException ioException) {
+            displayError("Something went wrong displaying the application form.");
+        }
     }
 
     /**
@@ -172,10 +208,5 @@ public class ApplicationMain implements Initializable {
     public void exitButtonAction() {
         JDBC.closeConnection();
         System.exit(0);
-    }
-
-    private void setDashUsername(){
-        dashUsername.setText("Appointments for user: "+ SessionData.getUsername());
-        System.out.println(dashUsername.getText());
     }
 }

@@ -84,15 +84,15 @@
          <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <TextField layoutX="234.0" layoutY="199.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField layoutX="234.0" layoutY="249.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField layoutX="234.0" layoutY="298.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField layoutX="234.0" layoutY="348.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField layoutX="234.0" layoutY="398.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField layoutX="234.0" layoutY="497.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField layoutX="847.0" layoutY="250.0" prefHeight="26.0" prefWidth="222.0" />
-   <ComboBox layoutX="234.0" layoutY="448.0" prefHeight="26.0" prefWidth="222.0" />
-   <ComboBox layoutX="847.0" layoutY="200.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="appIDText" layoutX="234.0" layoutY="199.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="titleText" layoutX="234.0" layoutY="249.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="descText" layoutX="234.0" layoutY="298.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="locationText" layoutX="234.0" layoutY="348.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="typeText" layoutX="234.0" layoutY="398.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="custIDText" layoutX="234.0" layoutY="497.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="contactIDText" layoutX="847.0" layoutY="250.0" prefHeight="26.0" prefWidth="222.0" />
+   <ComboBox fx:id="customerBox" layoutX="234.0" layoutY="448.0" prefHeight="26.0" prefWidth="222.0" />
+   <ComboBox fx:id="contactBox" layoutX="847.0" layoutY="200.0" prefHeight="26.0" prefWidth="222.0" />
    <DatePicker layoutX="848.0" layoutY="349.0" prefHeight="26.0" prefWidth="222.0" />
    <DatePicker layoutX="848.0" layoutY="300.0" prefHeight="26.0" prefWidth="222.0" />
 </AnchorPane>

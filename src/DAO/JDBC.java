@@ -18,7 +18,8 @@ public abstract class JDBC {
     private static final String accessUserName = "sqlUser";
     private static String accessPassword = "Passw0rd!";
     public static Connection conn;
-    // ========== Database ==========
+
+    // ========== Database Connection and App Login ==========
     /**
      * Opens connection to the database using attributes locally saved in this class.
      */
@@ -65,7 +66,8 @@ public abstract class JDBC {
             return Objects.equals(temp, passwordAttempt);
         }
     }
-    // ========== Appointments ==========
+
+    // ========== Appointment SQL Queries ==========
     /**
      * This method queries a list of all appointments.
      * @return an observable list of appointments with the specifications of the query
@@ -82,7 +84,6 @@ public abstract class JDBC {
                     rs.getString("Description"), rs.getString("Location"),rs.getString("Type"),
                     rs.getString("Start"),rs.getString("End"),rs.getInt("Customer_ID"),
                     rs.getInt("User_ID"),rs.getString("Contact_Name"));
-            System.out.println(appointment.getAppID());
             list.add(appointment);
         }
         return list;
@@ -105,7 +106,6 @@ public abstract class JDBC {
                     rs.getString("Description"), rs.getString("Location"),rs.getString("Type"),
                     rs.getString("Start"),rs.getString("End"),rs.getInt("Customer_ID"),
                     rs.getInt("User_ID"),rs.getString("Contact_Name"));
-            System.out.println(appointment.getAppID());
             list.add(appointment);
         }
         return list;
@@ -156,7 +156,8 @@ public abstract class JDBC {
         }
         return true;
     }
-    // ========== Customers ==========
+
+    // ========== Customer SQL Queries ==========
     /**
      * This method executes a query to pull a list of customers and their associated information.
      * @return an ObservableList containing customers.

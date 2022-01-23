@@ -1,4 +1,9 @@
 package Model;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -15,7 +20,6 @@ public abstract class SessionData {
     public static void setUsername (String username){
         userName = username;
     }
-
     /**
      * Returns username of this session.
      * @return username
@@ -25,9 +29,17 @@ public abstract class SessionData {
     }
 
     public static void recordLoginAttempt(String userName, boolean successfulLogin){
-        System.out.println(userName + ", " + successfulLogin);
+        try{
+            String format = "yyyy-MM-dd HH:mm:ss";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+            String timestamp = LocalDateTime.now(ZoneId.of("UTC")).format(formatter);
+            FileWriter writer = new FileWriter("login_logs.txt",true);
+            writer.write(userName+"\t"+timestamp+" UTC\t"+successfulLogin);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
     /**
      * Coverts UTC date and time as a string to local date and time as a string.
      * Local time is the local time of the JVM.
@@ -44,7 +56,6 @@ public abstract class SessionData {
         ZonedDateTime convertedTime = originalTime.withZoneSameInstant(toTimeZone);
         return convertedTime.format(formatter);
     }
-
     /**
      * Coverts local date and time as a string to UTC date and time as a string.
      * Local time is the local time of the JVM.
