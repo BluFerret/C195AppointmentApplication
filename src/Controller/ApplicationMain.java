@@ -3,6 +3,7 @@ package Controller;
 import DAO.JDBC;
 import Model.Appointment;
 import Model.Customer;
+import Model.LoginAttempt;
 import Model.SessionData;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,7 +27,7 @@ import static DAO.JDBC.listOfAppointments;
 
 public class ApplicationMain implements Initializable {
     @FXML private Label errorMessage;
-    @FXML private Label dashUsername;
+    // appointments
     @FXML private ToggleGroup AppointmentTab;
     @FXML private TableView<Appointment> appointmentTableView;
     @FXML private TableColumn<Appointment,Integer> cAppID;
@@ -40,6 +41,8 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,Integer> cAppCustomerID;
     @FXML private TableColumn<Appointment,Integer> cAppUserID;
     public ObservableList<Appointment> appointmentList;
+    // user dashboard
+    @FXML private Label dashUsername;
     @FXML private TableView<Appointment> dashAppointmentTableView;
     @FXML private TableColumn<Appointment,Integer> dAppID;
     @FXML private TableColumn<Appointment,String> dAppTitle;
@@ -52,6 +55,7 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,Integer> dAppCustomerID;
     @FXML private TableColumn<Appointment,Integer> dAppUserID;
     public ObservableList<Appointment> dashAppointmentList;
+    // customer
     @FXML private TableView<Customer> customerTableView;
     @FXML private TableColumn<Customer,Integer> custID;
     @FXML private TableColumn<Customer,String> custName;
@@ -63,6 +67,12 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Customer,String> custCountry;
     @FXML private TableColumn<Customer,Integer> custCountryID;
     public ObservableList<Customer> customerList;
+    // logs
+    @FXML private TableView<LoginAttempt> logTableView;
+    @FXML private TableColumn<LoginAttempt,String> logUsername;
+    @FXML private TableColumn<LoginAttempt,String> logTimestampUTC;
+    @FXML private TableColumn<LoginAttempt,String> logAttemptSucessful;
+    public ObservableList<LoginAttempt> loginList;
 
     // TODO: Customer records and appointments can be added, updated, and deleted. When deleting a customer record,
     //  all of the customer’s appointments must be deleted first, due to foreign key constraints.
@@ -105,7 +115,6 @@ public class ApplicationMain implements Initializable {
     //     and time, and customer ID. an additional report of your choice that is different from the two other required
     //     reports in this prompt and from the user log-in date and time stamp that will be tracked in part C.
     //    TODO: Write at least two different lambda expressions to improve your code.
-    //    TODO: track login attempts on txt file saved in root folder
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -116,8 +125,9 @@ public class ApplicationMain implements Initializable {
             e.printStackTrace();
             displayError("SQL error");
         }
+        // user dashboard setup
         dashUsername.setText("Appointments for user: "+ SessionData.getUsername());
-        dAppID.setCellValueFactory(new PropertyValueFactory<>("appID")); // dash appointment table for user
+        dAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
         dAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
         dAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
         dAppLoc.setCellValueFactory(new PropertyValueFactory<>("appLocation"));
@@ -128,7 +138,8 @@ public class ApplicationMain implements Initializable {
         dAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
         dAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
         dashAppointmentTableView.setItems(dashAppointmentList);
-        cAppID.setCellValueFactory(new PropertyValueFactory<>("appID")); // appointment table
+        // appointment table setup
+        cAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
         cAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
         cAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
         cAppLoc.setCellValueFactory(new PropertyValueFactory<>("appLocation"));
@@ -140,7 +151,8 @@ public class ApplicationMain implements Initializable {
         cAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
         if(appointmentList.isEmpty()){displayError("No appointments to display");}
         appointmentTableView.setItems(appointmentList);
-        custID.setCellValueFactory(new PropertyValueFactory<>("cusID")); // customer table
+        // customer table setup
+        custID.setCellValueFactory(new PropertyValueFactory<>("cusID"));
         custName.setCellValueFactory(new PropertyValueFactory<>("cusName"));
         custPhone.setCellValueFactory(new PropertyValueFactory<>("cusPhone"));
         custAddress.setCellValueFactory(new PropertyValueFactory<>("cusAddress"));
@@ -151,7 +163,13 @@ public class ApplicationMain implements Initializable {
         custCountryID.setCellValueFactory(new PropertyValueFactory<>("cusCountryCode"));
         if(customerList.isEmpty()){displayError("No customers to display");}
         customerTableView.setItems(customerList);
-
+        // logs table setup
+        loginList = SessionData.getLoginAttempts();
+        logUsername.setCellValueFactory(new PropertyValueFactory<>("userName"));
+        logTimestampUTC.setCellValueFactory(new PropertyValueFactory<>("timestampUTC"));
+        logAttemptSucessful.setCellValueFactory(new PropertyValueFactory<>("loginSucessful"));
+        if(loginList.isEmpty()){displayError("Error reading log file");}
+        logTableView.setItems(loginList);
     }
 
     private void updateAppointmentLists() throws SQLException {

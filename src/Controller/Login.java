@@ -5,24 +5,31 @@ import Model.SessionData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
+import java.time.ZoneId;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
-public class Login {
+public class Login implements Initializable {
     @FXML private Label errorMessage;
     @FXML private TextField userNameText;
     @FXML private TextField passwordText;
-    // TODO: Login determines the user’s location (i.e., ZoneId) and displays it in a label on the log-in form
+    @FXML private Label zoneIDLabel;
     // TODO: Login displays the log-in form in English or French based on the user’s computer language setting
     //  to translate all the text, labels, buttons, and errors on the form. Note: Some operating systems
     //  require a reboot when changing the language settings.
-
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        zoneIDLabel.setText(ZoneId.systemDefault().toString());
+    }
     /**
      * This method attempts a login based on the information provided from the user. Error messages are
      * displayed depending on if the user information provided is incomplete or does not match the login information
@@ -45,7 +52,7 @@ public class Login {
 
     public void loginButtonAction(ActionEvent e) throws IOException, SQLException {
         if (loginValidation()){
-            SessionData.setUsername(userNameText.getText());
+            SessionData.setUsernameAndLogs(userNameText.getText());
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/ApplicationMain.fxml")));
             Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
             Scene scene = new Scene(root);
