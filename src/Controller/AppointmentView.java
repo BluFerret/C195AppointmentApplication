@@ -9,10 +9,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -25,19 +25,16 @@ public class AppointmentView implements Initializable {
     @FXML private TextField typeText;
     @FXML private ComboBox<Contact> customerBox;
     @FXML private TextField custIDText;
-    @FXML private ComboBox<Contact> contactBox;
+    @FXML private ComboBox<String> contactBox;
     @FXML private TextField contactIDText;
     private static Appointment currentAppointment;
     private static boolean modifyAppointment = false;
-    private ObservableList<Contact> contactsAndIDs;
+    private ArrayList<Contact> contactsAndIDs;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            contactsAndIDs = JDBC.listOfContacts();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        contactsAndIDs = JDBC.listOfContactsAndIDs();
+        contactBox.setItems(JDBC.listOfContactNames());
 
         if(modifyAppointment){
             appIDText.setText(String.valueOf(currentAppointment.getAppID()));
@@ -46,8 +43,7 @@ public class AppointmentView implements Initializable {
             locationText.setText(currentAppointment.getAppLocation());
             typeText.setText(currentAppointment.getAppType());
             custIDText.setText(String.valueOf(currentAppointment.getAppCustomerID()));
-            contactIDText.setText(String.valueOf(contactsAndIDs.get(indexOfContactFromAttribute(currentAppointment.getAppContact())).getContactID()));
-        }
+            }
     }
 
     public static void setUpdateAppointment(Appointment appointment){

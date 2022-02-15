@@ -14,11 +14,12 @@ import java.util.Objects;
 
 public class Main extends Application {
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/Login.fxml")));
-        primaryStage.setTitle("Fictional Global Consulting Company");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+        stage.setTitle("Fictional Global Consulting Company");
+        stage.setScene(new Scene(root));
+        stage.show();
+        stage.centerOnScreen();
     }
 
     /**

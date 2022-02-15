@@ -57,14 +57,10 @@ public abstract class SessionData {
             read.useDelimiter(",");
             while (read.hasNext()) {
                 String userName = read.next();
-                System.out.println(userName);
                 String timestampUTC = read.next();
-                System.out.println(timestampUTC);
                 String loginSucessful = read.next();
-                System.out.println(loginSucessful);
                 LoginAttempt loginAttempt= new LoginAttempt(userName,timestampUTC,loginSucessful);
                 loginAttempts.add(loginAttempt);
-                System.out.println(loginAttempts.size());
             }
             read.close();
         } catch (FileNotFoundException e) {

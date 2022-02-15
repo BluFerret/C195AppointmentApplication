@@ -6,7 +6,14 @@ import Model.Customer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Objects;
+
+/**
+ * This Java Database Connection class connects to the local database and sends queries to the database to
+ * create, read, update, and delete data. The methods for opening and closing the database connection are paraphrased
+ * from code snippets from WGU course C195 code repository.
+ */
 
 public abstract class JDBC {
     private static final String protocol = "jdbc";
@@ -185,17 +192,6 @@ public abstract class JDBC {
      * @return an ObservableList containing all contacts and their IDs.
      * @throws SQLException - from the SQL executeQuery of the statement via database connection
      */
-    public static ObservableList<Contact> listOfContacts()throws SQLException{
-        ObservableList<Contact> list = FXCollections.observableArrayList();
-        Statement statement = conn.createStatement() ;
-        String q = "SELECT Contact_Name, Contact_ID FROM contacts;";
-        ResultSet rs = statement.executeQuery(q);
-        while(rs.next()){
-            Contact contact =  new Contact(rs.getString("Contact_Name"),rs.getInt("Contact_ID"));
-            list.add(contact);
-        }
-        return list;
-    }
     public static ObservableList<Country> listOfCountries()throws SQLException{
         ObservableList<Country> list = FXCollections.observableArrayList();
         Statement statement = conn.createStatement() ;
@@ -215,6 +211,78 @@ public abstract class JDBC {
         while(rs.next()){
             Country country =  new Country(rs.getString("Country"),rs.getInt("Country_ID"));
             list.add(country);
+        }
+        return list;
+    }
+
+    // ========== Contact SQL Queries ==========
+    public static ObservableList<String> listOfContactNames(){
+        ObservableList<String> list = FXCollections.observableArrayList();
+        try{
+            Statement statement = conn.createStatement() ;
+            String q = "SELECT Contact_Name FROM contacts;";
+            ResultSet rs = statement.executeQuery(q);
+                while(rs.next()){
+            String contactName =  rs.getString("Contact_Name");
+            list.add(contactName);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return list;
+    }
+    public static ArrayList<Contact> listOfContactsAndIDs(){
+        ArrayList<Contact> list = new ArrayList<>();
+        try {
+            Statement statement = conn.createStatement();
+            String q = "SELECT Contact_Name, Contact_ID FROM contacts;";
+            ResultSet rs = statement.executeQuery(q);
+            while (rs.next()) {
+                Contact contact = new Contact(rs.getString("Contact_Name"), rs.getInt("Contact_ID"));
+                list.add(contact);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return list;
+    }
+
+    // ========== Report SQL Queries ==========
+    public static ObservableList<Appointment> report1AppointmentsByMonthAndType() {
+        ObservableList<Appointment> list = FXCollections.observableArrayList();
+        try {
+            Statement statement = conn.createStatement();
+            String q = "SELECT Type, extract(MONTH FROM Start) AS Month ,count(*) AS Appointments FROM " +
+                    "client_schedule.appointments group by Type, Month(Start);";
+            ResultSet rs = statement.executeQuery(q);
+            while (rs.next()) {
+                Appointment appointment = new Appointment(rs.getString("Type"), rs.getInt("Month"),
+                        rs.getInt("Appointments"));
+                list.add(appointment);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return list;
+    }
+    public static ObservableList<Appointment> report2ScheduleByContact(String contactName){
+        ObservableList<Appointment> list = FXCollections.observableArrayList();
+        try{
+        Statement statement = conn.createStatement() ;
+        String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, users.User_ID, " +
+                    "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID JOIN " +
+                    "users ON users.User_ID = appointments.User_ID WHERE Contact_Name = \""+contactName+"\";";
+        ResultSet rs = statement.executeQuery(q);
+            while(rs.next()){
+                Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
+                        rs.getString("Description"), rs.getString("Location"),rs.getString("Type"),
+                        rs.getString("Start"),rs.getString("End"),rs.getInt("Customer_ID"),
+                        rs.getInt("User_ID"),rs.getString("Contact_Name"));
+                list.add(appointment);
+            }
+        }
+        catch (SQLException t) {
+            t.printStackTrace();
         }
         return list;
     }

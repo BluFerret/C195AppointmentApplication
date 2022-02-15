@@ -57,7 +57,8 @@ public class Login implements Initializable {
             Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
             Scene scene = new Scene(root);
             stage.setScene(scene);
-            stage.show();}
+            stage.show();
+            stage.centerOnScreen();}
     }
 
     /**

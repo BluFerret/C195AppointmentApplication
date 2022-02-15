@@ -5,8 +5,11 @@ import Model.Appointment;
 import Model.Customer;
 import Model.LoginAttempt;
 import Model.SessionData;
+import javafx.animation.PauseTransition;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -15,9 +18,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -67,6 +70,27 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Customer,String> custCountry;
     @FXML private TableColumn<Customer,Integer> custCountryID;
     public ObservableList<Customer> customerList;
+    // report 1
+    @FXML private TableView<Appointment> groupAppTable;
+    @FXML private TableColumn<Appointment,String> groupAppType;
+    @FXML private TableColumn<Appointment,String> groupAppMonth;
+    @FXML private TableColumn<Appointment,Integer> groupAppCount;
+    public ObservableList<Appointment> groupAppList;
+    // report 2
+    @FXML private Label report2Label;
+    @FXML private ComboBox<String> contactSelection;
+    @FXML private TableView<Appointment> contactTableView;
+    @FXML private TableColumn<Appointment,Integer> conAppID;
+    @FXML private TableColumn<Appointment,String> conAppTitle;
+    @FXML private TableColumn<Appointment,String> conAppDesc;
+    @FXML private TableColumn<Appointment,String> conAppLoc;
+    @FXML private TableColumn<Appointment,String> conAppContact;
+    @FXML private TableColumn<Appointment,String> conAppType;
+    @FXML private TableColumn<Appointment,String> conAppStartDT;
+    @FXML private TableColumn<Appointment,String> conAppEndDT;
+    @FXML private TableColumn<Appointment,Integer> conAppCustomerID;
+    @FXML private TableColumn<Appointment,Integer> conAppUserID;
+    public ObservableList<Appointment> conAppointmentList;
     // logs
     @FXML private TableView<LoginAttempt> logTableView;
     @FXML private TableColumn<LoginAttempt,String> logUsername;
@@ -138,7 +162,7 @@ public class ApplicationMain implements Initializable {
         dAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
         dAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
         dashAppointmentTableView.setItems(dashAppointmentList);
-        // appointment table setup
+        // appointment tab setup
         cAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
         cAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
         cAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
@@ -151,7 +175,7 @@ public class ApplicationMain implements Initializable {
         cAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
         if(appointmentList.isEmpty()){displayError("No appointments to display");}
         appointmentTableView.setItems(appointmentList);
-        // customer table setup
+        // customer tab setup
         custID.setCellValueFactory(new PropertyValueFactory<>("cusID"));
         custName.setCellValueFactory(new PropertyValueFactory<>("cusName"));
         custPhone.setCellValueFactory(new PropertyValueFactory<>("cusPhone"));
@@ -163,6 +187,29 @@ public class ApplicationMain implements Initializable {
         custCountryID.setCellValueFactory(new PropertyValueFactory<>("cusCountryCode"));
         if(customerList.isEmpty()){displayError("No customers to display");}
         customerTableView.setItems(customerList);
+        // report 1
+        groupAppType.setCellValueFactory(new PropertyValueFactory<>("appType"));
+        groupAppMonth.setCellValueFactory(new PropertyValueFactory<>("appMonth"));
+        groupAppCount.setCellValueFactory(new PropertyValueFactory<>("appCount"));
+        groupAppList=JDBC.report1AppointmentsByMonthAndType();
+        groupAppTable.setItems(groupAppList);
+        // report 2
+        ObservableList<String> contactTestSelectionList = JDBC.listOfContactNames();
+        contactSelection.setItems(contactTestSelectionList);
+        contactSelection.getSelectionModel().selectFirst();
+        conAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
+        conAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
+        conAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
+        conAppLoc.setCellValueFactory(new PropertyValueFactory<>("appLocation"));
+        conAppContact.setCellValueFactory(new PropertyValueFactory<>("appContact"));
+        conAppType.setCellValueFactory(new PropertyValueFactory<>("appType"));
+        conAppStartDT.setCellValueFactory(new PropertyValueFactory<>("appStartDateTime"));
+        conAppEndDT.setCellValueFactory(new PropertyValueFactory<>("appEndDateTime"));
+        conAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
+        conAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
+        conAppointmentList=JDBC.report2ScheduleByContact(contactSelection.getValue());
+        contactTableView.setItems(conAppointmentList);
+        report2Label.setText("Appointments for "+contactSelection.getValue());
         // logs table setup
         loginList = SessionData.getLoginAttempts();
         logUsername.setCellValueFactory(new PropertyValueFactory<>("userName"));
@@ -211,14 +258,24 @@ public class ApplicationMain implements Initializable {
         }
     }
 
+    public void contactSelectAction(){
+        conAppointmentList=JDBC.report2ScheduleByContact(contactSelection.getValue());
+        contactTableView.setItems(conAppointmentList);
+        contactTableView.refresh();
+        if(conAppointmentList.isEmpty()){displayError("Report 2- No appointments associated with that contact");}
+        report2Label.setText("Appointments for "+contactSelection.getValue());
+    }
+
     /**
      * Method to display error message to user. Error message initially set to be invisible and becomes visible once
-     * an error is shown to the user for the first time on the screen.
+     * an error is shown to the user for the first time on the screen. Error becomes invisible again after 10 seconds.
      * @param s- String containing error message to be displayed to the user.
      */
     private void displayError(String s){
         errorMessage.setText(s);
         errorMessage.setVisible(true);
+        PauseTransition visibleErrorText = new PauseTransition(Duration.seconds(10));
+        visibleErrorText.setOnFinished(actionEvent -> errorMessage.setVisible(false));
     }
     /**
      * This method is called when the exit button is clicked. This closes the connection to the database and exits the program.

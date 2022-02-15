@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
@@ -142,7 +143,55 @@
             </AnchorPane>
          </content>
       </Tab>
-      <Tab text="   Reports   ">
+      <Tab text="   Report 1   ">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
+               <children>
+                  <TableView fx:id="groupAppTable" layoutX="23.0" layoutY="121.0" prefHeight="358.0" prefWidth="1182.0">
+                     <columns>
+                        <TableColumn fx:id="groupAppType" prefWidth="349.6000175476074" text="Appointment Type" />
+                        <TableColumn fx:id="groupAppMonth" minWidth="0.0" prefWidth="451.20001220703125" text="Appointment Month" />
+                        <TableColumn fx:id="groupAppCount" prefWidth="382.4000244140625" text="Count of Appointments" />
+                     </columns>
+                  </TableView>
+                  <Label contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="637.0" text="Appointment Count Grouped by Type and Month" textAlignment="CENTER" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="   Report 2   ">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
+               <children>
+                  <TableView fx:id="contactTableView" layoutX="23.0" layoutY="121.0" prefHeight="358.0" prefWidth="1182.0">
+                     <columns>
+                        <TableColumn fx:id="conAppID" prefWidth="39.99999809265137" text="ID" />
+                        <TableColumn fx:id="conAppTitle" prefWidth="86.39999389648438" text="Title" />
+                        <TableColumn fx:id="conAppDesc" prefWidth="127.99998474121094" text="Description" />
+                        <TableColumn fx:id="conAppLoc" prefWidth="145.5999755859375" text="Location" />
+                        <TableColumn fx:id="conAppContact" prefWidth="139.20001220703125" text="Contact" />
+                        <TableColumn fx:id="conAppType" prefWidth="117.5999755859375" text="Type" />
+                        <TableColumn fx:id="conAppStartDT" prefWidth="168.0" text="Start Date/Time" />
+                        <TableColumn fx:id="conAppEndDT" prefWidth="165.59991455078125" text="End Date/Time" />
+                        <TableColumn fx:id="conAppCustomerID" prefWidth="94.4000244140625" text="Customer ID" />
+                        <TableColumn fx:id="conAppUserID" prefWidth="94.4000244140625" text="User ID" />
+                     </columns>
+                  </TableView>
+                  <Label fx:id="report2Label" contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="390.0" text="Appointments for &lt;Contact&gt;" textAlignment="CENTER" textFill="#0c7604">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="contactSelection" layoutX="411.0" layoutY="38.0" onAction="#contactSelectAction" prefHeight="26.0" prefWidth="407.0" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="   Report 3   ">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
                <children>
@@ -151,6 +200,9 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
+                  <Button layoutX="589.0" layoutY="222.0" mnemonicParsing="false" text="Report 2" />
+                  <Button layoutX="233.0" layoutY="222.0" mnemonicParsing="false" text="Report 1" />
+                  <Button layoutX="945.0" layoutY="222.0" mnemonicParsing="false" text="Report 3" />
                </children>
             </AnchorPane>
          </content>
