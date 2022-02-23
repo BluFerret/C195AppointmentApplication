@@ -23,7 +23,6 @@ public abstract class SessionData {
         userName = username;
         setLoginAttempts();
     }
-
     /**
      * Returns username of this session.
      * @return username
@@ -44,14 +43,11 @@ public abstract class SessionData {
             e.printStackTrace();
         }
     }
-
     public static ObservableList<LoginAttempt> getLoginAttempts() {
         return loginAttempts;
     }
     private static void setLoginAttempts(){
-        System.out.println("set login attempts called");
         loginAttempts = FXCollections.observableArrayList();
-
         try {
             Scanner read = new Scanner(new File("login_logs.txt"));
             read.useDelimiter(",");
@@ -67,7 +63,6 @@ public abstract class SessionData {
             System.out.println("File not found to read");
         }
     }
-
     /**
      * Coverts UTC date and time as a string to local date and time as a string.
      * Local time is the local time of the JVM.
@@ -87,28 +82,51 @@ public abstract class SessionData {
     /**
      * Coverts local date and time as a string to UTC date and time as a string.
      * Local time is the local time of the JVM.
-     * @param dateAndTimeUTC - a string containing the date and time in local timezone
+     * @param dateAndTimeLocal - a string containing the date and time in local timezone
      * @return a string containing the date and time provided but converted to UTC timezone
      */
-    public static String convertLocaltoUTC(String dateAndTimeUTC){
+    public static String convertLocaltoUTC(String dateAndTimeLocal){
         String format = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         ZoneId fromTimeZone = ZoneId.systemDefault();
         ZoneId toTimeZone = ZoneId.of("UTC");
-        LocalDateTime date = LocalDateTime.parse(dateAndTimeUTC, formatter);
+        LocalDateTime date = LocalDateTime.parse(dateAndTimeLocal, formatter);
         ZonedDateTime originalTime = date.atZone(fromTimeZone);
         ZonedDateTime convertedTime = originalTime.withZoneSameInstant(toTimeZone);
         return convertedTime.format(formatter);
     }
-//    public static boolean validateTime(String utcTime){
-//        String format = "yyyy-MM-dd HH:mm:ss";
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-//        ZoneId fromTimeZone = ZoneId.of("UTC");
-//        ZoneId toTimeZone = ZoneId.of("America/New_York");
-//        LocalDateTime date = LocalDateTime.parse(utcTime, formatter);
-//        ZonedDateTime originalTime = date.atZone(fromTimeZone);
-//        ZonedDateTime convertedTime = originalTime.withZoneSameInstant(toTimeZone);
-//        String hour = new SimpleDateFormat("H:mm").format(convertedTime);
-//
-//    }
+    public static String convertESTtoLocal(String dateAndTimeEST){
+        String format = "yyyy-MM-dd HH:mm:ss";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        ZoneId toTimeZone = ZoneId.systemDefault();
+        ZoneId fromTimeZone = ZoneId.of("US/Eastern");
+        LocalDateTime date = LocalDateTime.parse(dateAndTimeEST, formatter);
+        ZonedDateTime originalTime = date.atZone(fromTimeZone);
+        ZonedDateTime convertedTime = originalTime.withZoneSameInstant(toTimeZone);
+        return convertedTime.format(formatter);
+    }
+    public static String currentTimeUTC(){
+        String format = "yyyy-MM-dd HH:mm:ss";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        String localTimeNow = formatter.format(LocalDateTime.now());
+        return convertLocaltoUTC(localTimeNow);
+    }
+    public static String parseStringComma(String string){
+        int i = string.indexOf(",");
+        String parsedString = null;
+        if (i!=-1) {parsedString= string.substring(0 , i);}
+        return parsedString;
+    }
+    public static String parseCommaString(String string){
+        int i = string.indexOf(",");
+        String parsedString = null;
+        if (i!=-1) {parsedString= string.substring(i+2);}
+        return parsedString;
+    }
+    public static String parseDateFromDateTime(String dateTime){
+        return dateTime.substring(0,10);
+    }
+    public static String parseTimeFromDateTime(String dateTime){
+        return dateTime.substring(11);
+    }
 }

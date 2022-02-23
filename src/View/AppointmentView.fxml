@@ -9,22 +9,22 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="637.0" prefWidth="1229.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AppointmentView">
-    <Label alignment="CENTER" layoutX="3.0" layoutY="11.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
+    <Label alignment="CENTER" layoutX="56.0" layoutY="11.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
         <font>
             <Font name="System Bold" size="18.0" />
         </font>
     </Label>
-    <Button layoutX="1157.0" layoutY="592.0" mnemonicParsing="false" onAction="#exitButtonAction" text="Exit" textFill="#0c7604">
+    <Button layoutX="1096.0" layoutY="569.0" mnemonicParsing="false" onAction="#cancelButtonAction" text="Cancel" textFill="#0c7604">
         <font>
             <Font name="System Bold" size="14.0" />
         </font>
     </Button>
-    <Label fx:id="errorMessage" alignment="CENTER" layoutX="330.0" layoutY="11.0" prefHeight="38.0" prefWidth="562.0" text="Error Message" textAlignment="CENTER" textFill="#ea1a0b" visible="false">
+    <Label fx:id="errorMessage" alignment="CENTER" layoutX="17.0" layoutY="112.0" prefHeight="38.0" prefWidth="1194.0" text="Error Message" textAlignment="CENTER" textFill="#ea1a0b" visible="false">
         <font>
             <Font name="System Bold" size="14.0" />
         </font>
     </Label>
-   <Label alignment="CENTER" layoutX="4.0" layoutY="45.0" prefHeight="38.0" prefWidth="323.0" text="Appointment" textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER" layoutX="57.0" layoutY="45.0" prefHeight="38.0" prefWidth="323.0" text="Appointment" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
@@ -49,17 +49,7 @@
          <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <Label alignment="CENTER_RIGHT" layoutX="12.0" layoutY="492.0" prefHeight="38.0" prefWidth="179.0" text="Customer ID" textAlignment="CENTER" textFill="#0c7604">
-      <font>
-         <Font name="System Bold" size="18.0" />
-      </font>
-   </Label>
-   <Label alignment="CENTER_RIGHT" layoutX="625.0" layoutY="292.0" prefHeight="38.0" prefWidth="179.0" text="Start Date and Time" textAlignment="CENTER" textFill="#0c7604">
-      <font>
-         <Font name="System Bold" size="18.0" />
-      </font>
-   </Label>
-   <Label alignment="CENTER_RIGHT" layoutX="624.0" layoutY="342.0" prefHeight="38.0" prefWidth="179.0" text="End Date and Time" textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER_RIGHT" layoutX="625.0" layoutY="294.0" prefHeight="38.0" prefWidth="179.0" text="Appointment Date" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
@@ -74,25 +64,40 @@
          <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <Label alignment="CENTER_RIGHT" layoutX="626.0" layoutY="192.0" prefHeight="38.0" prefWidth="179.0" text="Contact" textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER_RIGHT" layoutX="13.0" layoutY="490.0" prefHeight="38.0" prefWidth="179.0" text="Contact" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <Label alignment="CENTER_RIGHT" layoutX="625.0" layoutY="242.0" prefHeight="38.0" prefWidth="179.0" text="Contact ID" textAlignment="CENTER" textFill="#0c7604">
-      <font>
-         <Font name="System Bold" size="18.0" />
-      </font>
-   </Label>
-   <TextField fx:id="appIDText" layoutX="234.0" layoutY="199.0" prefHeight="26.0" prefWidth="222.0" />
+   <TextField fx:id="appIDText" disable="true" layoutX="234.0" layoutY="199.0" prefHeight="26.0" prefWidth="222.0" />
    <TextField fx:id="titleText" layoutX="234.0" layoutY="249.0" prefHeight="26.0" prefWidth="222.0" />
    <TextField fx:id="descText" layoutX="234.0" layoutY="298.0" prefHeight="26.0" prefWidth="222.0" />
    <TextField fx:id="locationText" layoutX="234.0" layoutY="348.0" prefHeight="26.0" prefWidth="222.0" />
    <TextField fx:id="typeText" layoutX="234.0" layoutY="398.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField fx:id="custIDText" layoutX="234.0" layoutY="497.0" prefHeight="26.0" prefWidth="222.0" />
-   <TextField fx:id="contactIDText" layoutX="847.0" layoutY="250.0" prefHeight="26.0" prefWidth="222.0" />
    <ComboBox fx:id="customerBox" layoutX="234.0" layoutY="448.0" prefHeight="26.0" prefWidth="222.0" />
-   <ComboBox fx:id="contactBox" layoutX="847.0" layoutY="200.0" prefHeight="26.0" prefWidth="222.0" />
-   <DatePicker layoutX="848.0" layoutY="349.0" prefHeight="26.0" prefWidth="222.0" />
-   <DatePicker layoutX="848.0" layoutY="300.0" prefHeight="26.0" prefWidth="222.0" />
+   <ComboBox fx:id="contactBox" layoutX="234.0" layoutY="498.0" prefHeight="26.0" prefWidth="222.0" />
+   <DatePicker fx:id="startDateBox" layoutX="848.0" layoutY="302.0" onAction="#populateDateTimeComboBoxes" prefHeight="26.0" prefWidth="222.0" />
+   <Label alignment="CENTER_RIGHT" layoutX="625.0" layoutY="354.0" prefHeight="38.0" prefWidth="179.0" text="Start Date/Time" textAlignment="CENTER" textFill="#0c7604">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font>
+   </Label>
+   <ComboBox fx:id="startTimeComboBox" layoutX="848.0" layoutY="361.0" prefHeight="26.0" prefWidth="222.0" />
+   <Label alignment="CENTER_RIGHT" layoutX="625.0" layoutY="414.0" prefHeight="38.0" prefWidth="179.0" text="End Date/Time" textAlignment="CENTER" textFill="#0c7604">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font>
+   </Label>
+   <ComboBox fx:id="endTimeComboBox" layoutX="848.0" layoutY="421.0" prefHeight="26.0" prefWidth="222.0" />
+   <Button layoutX="1010.0" layoutY="569.0" mnemonicParsing="false" onAction="#saveAppointment" text="Save" textFill="#0c7604">
+      <font>
+         <Font name="System Bold" size="14.0" />
+      </font>
+   </Button>
+   <Label alignment="CENTER_RIGHT" layoutX="628.0" layoutY="232.0" prefHeight="38.0" prefWidth="179.0" text="User" textAlignment="CENTER" textFill="#0c7604">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font>
+   </Label>
+   <ComboBox fx:id="userBox" layoutX="848.0" layoutY="239.0" prefHeight="26.0" prefWidth="222.0" />
 </AnchorPane>

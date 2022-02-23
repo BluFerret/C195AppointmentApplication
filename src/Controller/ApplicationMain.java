@@ -1,15 +1,10 @@
 package Controller;
 
 import DAO.JDBC;
-import Model.Appointment;
-import Model.Customer;
-import Model.LoginAttempt;
-import Model.SessionData;
+import Model.*;
 import javafx.animation.PauseTransition;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -19,17 +14,28 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
 import static DAO.JDBC.listOfAppointments;
 
 public class ApplicationMain implements Initializable {
     @FXML private Label errorMessage;
+    // user dashboard
+    @FXML private Label dashUsername;
+    @FXML private TableView<Appointment> dashAppointmentTableView;
+    @FXML private TableColumn<Appointment,Integer> dAppID;
+    @FXML private TableColumn<Appointment,String> dAppTitle;
+    @FXML private TableColumn<Appointment,String> dAppDesc;
+    @FXML private TableColumn<Appointment,String> dAppLoc;
+    @FXML private TableColumn<Appointment,String> dAppContact;
+    @FXML private TableColumn<Appointment,String> dAppType;
+    @FXML private TableColumn<Appointment,String> dAppStartDT;
+    @FXML private TableColumn<Appointment,String> dAppEndDT;
+    @FXML private TableColumn<Appointment,Integer> dAppCustomerID;
+    private ObservableList<Appointment> dashAppointmentList;
     // appointments
     @FXML private ToggleGroup AppointmentTab;
     @FXML private TableView<Appointment> appointmentTableView;
@@ -43,21 +49,7 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,String> cAppEndDT;
     @FXML private TableColumn<Appointment,Integer> cAppCustomerID;
     @FXML private TableColumn<Appointment,Integer> cAppUserID;
-    public ObservableList<Appointment> appointmentList;
-    // user dashboard
-    @FXML private Label dashUsername;
-    @FXML private TableView<Appointment> dashAppointmentTableView;
-    @FXML private TableColumn<Appointment,Integer> dAppID;
-    @FXML private TableColumn<Appointment,String> dAppTitle;
-    @FXML private TableColumn<Appointment,String> dAppDesc;
-    @FXML private TableColumn<Appointment,String> dAppLoc;
-    @FXML private TableColumn<Appointment,String> dAppContact;
-    @FXML private TableColumn<Appointment,String> dAppType;
-    @FXML private TableColumn<Appointment,String> dAppStartDT;
-    @FXML private TableColumn<Appointment,String> dAppEndDT;
-    @FXML private TableColumn<Appointment,Integer> dAppCustomerID;
-    @FXML private TableColumn<Appointment,Integer> dAppUserID;
-    public ObservableList<Appointment> dashAppointmentList;
+    private ObservableList<Appointment> appointmentList;
     // customer
     @FXML private TableView<Customer> customerTableView;
     @FXML private TableColumn<Customer,Integer> custID;
@@ -69,13 +61,12 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Customer,Integer> custDivID;
     @FXML private TableColumn<Customer,String> custCountry;
     @FXML private TableColumn<Customer,Integer> custCountryID;
-    public ObservableList<Customer> customerList;
+    private ObservableList<Customer> customerList;
     // report 1
     @FXML private TableView<Appointment> groupAppTable;
     @FXML private TableColumn<Appointment,String> groupAppType;
     @FXML private TableColumn<Appointment,String> groupAppMonth;
     @FXML private TableColumn<Appointment,Integer> groupAppCount;
-    public ObservableList<Appointment> groupAppList;
     // report 2
     @FXML private Label report2Label;
     @FXML private ComboBox<String> contactSelection;
@@ -90,7 +81,7 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,String> conAppEndDT;
     @FXML private TableColumn<Appointment,Integer> conAppCustomerID;
     @FXML private TableColumn<Appointment,Integer> conAppUserID;
-    public ObservableList<Appointment> conAppointmentList;
+    private ObservableList<Appointment> conAppointmentList;
     // logs
     @FXML private TableView<LoginAttempt> logTableView;
     @FXML private TableColumn<LoginAttempt,String> logUsername;
@@ -98,34 +89,14 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<LoginAttempt,String> logAttemptSucessful;
     public ObservableList<LoginAttempt> loginList;
 
-    // TODO: Customer records and appointments can be added, updated, and deleted. When deleting a customer record,
-    //  all of the customer’s appointments must be deleted first, due to foreign key constraints.
-    // TODO: When adding and updating a customer, text fields are used to collect the following data: customer name,
-    //  address, postal code, and phone number. Customer IDs are auto-generated, and first-level division
-    //  (i.e., states, provinces) and country data are collected using separate combo boxes.
-    // TODO: Country and first-level division data is pre-populated in separate combo boxes or lists in the user
-    //  interface for the user to choose. The first-level list should be filtered by the user’s selection of a
-    //  country (e.g., when choosing U.S., filter so it only shows states).
-    //  TODO: When a customer record is deleted, a custom message should display in the user interface.
-    //  TODO: Write code that enables the user to add, update, and delete appointments. A contact name is assigned to
-    //   an appointment using a drop-down menu or combo box. A custom message is displayed in the user interface with
-    //   the Appointment_ID and type of appointment canceled. The Appointment_ID is auto-generated and disabled
-    //   throughout the application. When adding and updating an appointment, record the following data:
-    //   Appointment_ID, title, description, location, contact, type, start date and time, end date and time,
-    //   Customer_ID, and User_ID. All of the original appointment information is displayed on the update form in
-    //   local time zone. All of the appointment fields can be updated except Appointment_ID, which must be disabled.
-    //   TODO: Write code that enables the user to adjust appointment times. While the appointment times should be
-    //    stored in Coordinated Universal Time (UTC), they should be automatically and consistently updated according
-    //    to the local time zone set on the user’s computer wherever appointments are displayed in the application.
-    //    Note: There are up to three time zones in effect. Coordinated Universal Time (UTC) is used for storing the
-    //    time in the database, the user’s local time is used for display purposes, and Eastern Standard Time (EST) is
-    //    used for the company’s office hours. Local time will be checked against EST business hours before they are
-    //    stored in the database as UTC.
+    // TODO: Customers & appointments can be added, updated, and deleted. When deleting a customer, all of the customer’s
+    //  appointments must be deleted first.
+    //  TODO: When a customer or appointment record is deleted, a custom message should display in the user interface that includes
+    //   appointment type. id, and customer name where applicable.
+    //  TODO: Add user ID to appointments adding/modification.
     //    TODO: Write code to implement input validation and logical error checks to prevent each of the following
     //     changes when adding or updating information; display a custom message specific for each error check in the
-    //     user interface: scheduling an appointment outside of business hours defined as 8:00 a.m. to 10:00 p.m. EST,
-    //     including weekends. scheduling overlapping appointments for customers. entering an incorrect username and
-    //     password.
+    //     user interface: scheduling overlapping appointments for customers.
     //    TODO: Write code to provide an alert when there is an appointment within 15 minutes of the user’s log-in.
     //     A custom message should be displayed in the user interface and include the appointment ID, date, and time.
     //     If the user does not have any appointments within 15 minutes of logging in, display a custom message in the
@@ -133,24 +104,15 @@ public class ApplicationMain implements Initializable {
     //     application outside of business hours, your alerts must be robust enough to trigger an appointment within
     //     15 minutes of the local time set on the user’s computer, which may or may not be EST.
     //    TODO: Write code that generates accurate information in each of the following reports and will display the
-    //     reports in the user interface: Note: You do not need to save and print the reports to a file or provide
-    //     a screenshot.the total number of customer appointments by type and month. a schedule for each contact in
-    //     your organization that includes appointment ID, title, type and description, start date and time, end date
-    //     and time, and customer ID. an additional report of your choice that is different from the two other required
-    //     reports in this prompt and from the user log-in date and time stamp that will be tracked in part C.
+    //     reports in the user interface: an additional report of your choice
     //    TODO: Write at least two different lambda expressions to improve your code.
-
+    // TODO:Javadoc note
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            updateAppointmentLists();
-            updateCustomerList();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            displayError("SQL error");
-        }
+        updateAppointmentLists();
+        updateCustomerList();
         // user dashboard setup
-        dashUsername.setText("Appointments for user: "+ SessionData.getUsername());
+        dashUsername.setText("Upcoming Appointments for User: "+ SessionData.getUsername());
         dAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
         dAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
         dAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
@@ -160,7 +122,6 @@ public class ApplicationMain implements Initializable {
         dAppStartDT.setCellValueFactory(new PropertyValueFactory<>("appStartDateTime"));
         dAppEndDT.setCellValueFactory(new PropertyValueFactory<>("appEndDateTime"));
         dAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
-        dAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
         dashAppointmentTableView.setItems(dashAppointmentList);
         // appointment tab setup
         cAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
@@ -191,7 +152,7 @@ public class ApplicationMain implements Initializable {
         groupAppType.setCellValueFactory(new PropertyValueFactory<>("appType"));
         groupAppMonth.setCellValueFactory(new PropertyValueFactory<>("appMonth"));
         groupAppCount.setCellValueFactory(new PropertyValueFactory<>("appCount"));
-        groupAppList=JDBC.report1AppointmentsByMonthAndType();
+        ObservableList<Appointment> groupAppList = JDBC.report1AppointmentsByMonthAndType();
         groupAppTable.setItems(groupAppList);
         // report 2
         ObservableList<String> contactTestSelectionList = JDBC.listOfContactNames();
@@ -207,7 +168,7 @@ public class ApplicationMain implements Initializable {
         conAppEndDT.setCellValueFactory(new PropertyValueFactory<>("appEndDateTime"));
         conAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
         conAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
-        conAppointmentList=JDBC.report2ScheduleByContact(contactSelection.getValue());
+        conAppointmentList=JDBC.report2ScheduleByContact(SessionData.parseStringComma(contactSelection.getValue()));
         contactTableView.setItems(conAppointmentList);
         report2Label.setText("Appointments for "+contactSelection.getValue());
         // logs table setup
@@ -215,23 +176,29 @@ public class ApplicationMain implements Initializable {
         logUsername.setCellValueFactory(new PropertyValueFactory<>("userName"));
         logTimestampUTC.setCellValueFactory(new PropertyValueFactory<>("timestampUTC"));
         logAttemptSucessful.setCellValueFactory(new PropertyValueFactory<>("loginSucessful"));
-        if(loginList.isEmpty()){displayError("Error reading log file");}
         logTableView.setItems(loginList);
     }
-
-    private void updateAppointmentLists() throws SQLException {
-        appointmentList = listOfAppointments();
-        dashAppointmentList = listOfAppointments(SessionData.getUsername());
+    // TODO:Javadoc note
+    private void updateAppointmentLists() {
+        try{appointmentList = listOfAppointments();}
+        catch (SQLException throwables) {
+            displayError("There was an error and no appointments could be found, please try again later.");
+        }
+        try{dashAppointmentList = listOfAppointments(SessionData.getUsername());}
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
-
     /**
      * updates the list of customers
-     * @throws SQLException - from the SQL executeQuery of the statement via database connection
      */
-    private void updateCustomerList() throws SQLException{
-        customerList = JDBC.listOfCustomers();
+    private void updateCustomerList(){
+        try{customerList = JDBC.listOfCustomers();} catch (SQLException throwables) {
+            displayError("There was an error pulling the customers from the database");
+            throwables.printStackTrace();
+        }
     }
-
+    // TODO:Javadoc note
     public void updateAppointmentAction(ActionEvent e) {
         try {
             AppointmentView.setUpdateAppointment(appointmentTableView.getSelectionModel().getSelectedItem());
@@ -245,7 +212,7 @@ public class ApplicationMain implements Initializable {
             displayError("Something went wrong: Please select an appointment to modify and try again.");
         }
     }
-
+    // TODO:Javadoc note
     public void newAppointmentAction(ActionEvent e){
         try {
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../View/AppointmentView.fxml")));
@@ -253,22 +220,48 @@ public class ApplicationMain implements Initializable {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
-        } catch (IOException ioException) {
-            displayError("Something went wrong displaying the application form.");
+        } catch (IOException x) {
+            displayError("Something went wrong displaying the appointment form.");
         }
     }
-
+    public void deleteAppointment(){}
+    // TODO:Javadoc note
+    public void updateCustomerAction(ActionEvent e) {
+        try {
+            CustomerView.setUpdateCustomer(customerTableView.getSelectionModel().getSelectedItem());
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../View/CustomerView.fxml")));
+            Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        }
+        catch (IOException x) {
+            displayError("Something went wrong: Please select a customer to modify and try again.");
+        }
+    }
+    // TODO:Javadoc note **** possibly replace all new windows with lambdas
+    public void newCustomerAction(ActionEvent e){
+        try {
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../View/CustomerView.fxml")));
+            Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException x) {
+            displayError("Something went wrong displaying the customer form.");
+        }
+    }
+    // TODO:Javadoc note
     public void contactSelectAction(){
-        conAppointmentList=JDBC.report2ScheduleByContact(contactSelection.getValue());
+        conAppointmentList=JDBC.report2ScheduleByContact(SessionData.parseStringComma(contactSelection.getValue()));
         contactTableView.setItems(conAppointmentList);
         contactTableView.refresh();
         if(conAppointmentList.isEmpty()){displayError("Report 2- No appointments associated with that contact");}
         report2Label.setText("Appointments for "+contactSelection.getValue());
     }
-
     /**
-     * Method to display error message to user. Error message initially set to be invisible and becomes visible once
-     * an error is shown to the user for the first time on the screen. Error becomes invisible again after 10 seconds.
+     * Method to display error message to user. Lambda used for setOnFinished of PauseTransition to return error text
+     * to be invisible after 10 seconds.
      * @param s- String containing error message to be displayed to the user.
      */
     private void displayError(String s){
@@ -276,6 +269,7 @@ public class ApplicationMain implements Initializable {
         errorMessage.setVisible(true);
         PauseTransition visibleErrorText = new PauseTransition(Duration.seconds(10));
         visibleErrorText.setOnFinished(actionEvent -> errorMessage.setVisible(false));
+        visibleErrorText.play();
     }
     /**
      * This method is called when the exit button is clicked. This closes the connection to the database and exits the program.

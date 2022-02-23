@@ -1,6 +1,6 @@
 package Model;
 
-import java.text.SimpleDateFormat;
+import java.time.Month;
 
 public class Appointment {
     private int appID; // appointment ID - Appointment_ID INT(10) (PK)
@@ -33,7 +33,7 @@ public class Appointment {
 
     public Appointment(String appType, int appMonth, int appCount) {
         this.appType = appType;
-        this.appMonth = new SimpleDateFormat("MMMM").format(appMonth-1);
+        this.appMonth = Month.of(appMonth).toString();
         this.appCount = appCount;
     }
 

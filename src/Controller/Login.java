@@ -2,6 +2,7 @@ package Controller;
 
 import DAO.JDBC;
 import Model.SessionData;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -18,59 +21,91 @@ import java.time.ZoneId;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * This is the controller class for the Login.fxml view. The login displays the user's zone and accepts a
+ * username and password from the user. If the username and password match a valid username and password combination
+ * stored in the connected database, the login will send the user to the ApplicationMain view. An error message will
+ * be displayed for 10 seconds if errors are encountered. The login view will have all components translated to French
+ * if the user's computer language setting is set to French. Otherwise, the login view is displayed in English.
+ */
 public class Login implements Initializable {
     @FXML private Label errorMessage;
     @FXML private TextField userNameText;
     @FXML private TextField passwordText;
     @FXML private Label zoneIDLabel;
     // TODO: Login displays the log-in form in English or French based on the user’s computer language setting
-    //  to translate all the text, labels, buttons, and errors on the form. Note: Some operating systems
-    //  require a reboot when changing the language settings.
+
+    /**
+     * This method initializes the controller and populates the zoneID label.
+     * @param url - possible url location for root object if provided, null if not needed.
+     * @param resourceBundle - possible resources for root object, null if not needed.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         zoneIDLabel.setText(ZoneId.systemDefault().toString());
     }
     /**
-     * This method attempts a login based on the information provided from the user. Error messages are
-     * displayed depending on if the user information provided is incomplete or does not match the login information
-     * in the database.
+     * This method validates a user's attempt at logging in to the application. An error message is displayed if a
+     * username or password are not provided as well as if the username and password do not match a username and
+     * password combination stored in the connected database. The result of the validation is recorded in the login_logs
+     * text file if both username and password fields are filled in when making an attempt at logging in.
      * @return = a boolean that shows if the provided login information matches the login information in the database
-     * @throws SQLException - from the SQL executeQuery of the statement via database connection
      */
-    private boolean loginValidation() throws SQLException {
-        boolean loginAttempt = true;
+    private boolean loginValidation(){
         if(userNameText.getText().isEmpty() || passwordText.getText().isEmpty()){
-            displayError("Please enter a user name and password."); // if username or password are empty
-            loginAttempt = false;}
-        else if(!JDBC.validateUsernameAndPassword(userNameText.getText(),passwordText.getText())){
-            displayError("Username and/or password not valid, please try again."); // if username/password don't match database
-            loginAttempt = false;
+            displayError("Please fill in both username and password fields");
+            return false;
+        }
+        try{
+            if(JDBC.validateUsernameAndPassword(userNameText.getText(),passwordText.getText())){
+                SessionData.recordLoginAttempt(userNameText.getText(),true);
+                return true;
             }
-        SessionData.recordLoginAttempt(userNameText.getText(),loginAttempt);
-        return loginAttempt;
+            else{
+                displayError("Username and password are incorrect. Please try again.");
+                SessionData.recordLoginAttempt(userNameText.getText(),false);
+                return false;
+            }
+        } catch (SQLException throwables) {
+            displayError("SQL exception: please make sure database is connected.");
+            throwables.printStackTrace();
+            return false;
+        }
     }
-
-    public void loginButtonAction(ActionEvent e) throws IOException, SQLException {
+    /**
+     * This method is called when the login button is pressed. If the login is validated, the ApplicationMain View will
+     * be displayed.
+     * @param e - event of clicking the login button
+     */
+    public void loginButtonAction(ActionEvent e) {
         if (loginValidation()){
             SessionData.setUsernameAndLogs(userNameText.getText());
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/ApplicationMain.fxml")));
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/ApplicationMain.fxml")));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             Stage stage = (Stage) ((javafx.scene.Node) e.getSource()).getScene().getWindow();
+            assert root != null;
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
-            stage.centerOnScreen();}
+            stage.centerOnScreen();
+        }
     }
-
     /**
-     * Method to display error message to user. Error message initially set to be invisible and becomes visible once
-     * an error is shown to the user for the first time on the screen.
+     * Method to display error message to user. A Lambda was used for setOnFinished of PauseTransition to return error
+     * text to be invisible after 10 seconds.
      * @param s- String containing error message to be displayed to the user.
      */
     private void displayError(String s){
         errorMessage.setText(s);
         errorMessage.setVisible(true);
+        PauseTransition visibleErrorText = new PauseTransition(Duration.seconds(10));
+        visibleErrorText.setOnFinished(actionEvent -> errorMessage.setVisible(false));
+        visibleErrorText.play();
     }
-
     /**
      * This method is called when the exit button is clicked. This closes the connection to the database and exits the program.
      */

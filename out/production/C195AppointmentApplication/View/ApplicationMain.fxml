@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -16,30 +17,24 @@
    <TabPane layoutY="66.0" prefHeight="522.0" prefWidth="1229.0" tabClosingPolicy="UNAVAILABLE">
       <Tab text="   User Dashboard   ">
          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
-            <TableView fx:id="dashAppointmentTableView" layoutX="23.0" layoutY="121.0" prefHeight="358.0" prefWidth="1182.0">
+            <TableView fx:id="dashAppointmentTableView" layoutX="23.0" layoutY="282.0" prefHeight="197.0" prefWidth="1182.0">
                <columns>
                   <TableColumn fx:id="dAppID" prefWidth="39.99999809265137" text="ID" />
-                  <TableColumn fx:id="dAppTitle" prefWidth="86.39999389648438" text="Title" />
-                  <TableColumn fx:id="dAppDesc" prefWidth="127.99998474121094" text="Description" />
-                  <TableColumn fx:id="dAppLoc" prefWidth="145.5999755859375" text="Location" />
-                  <TableColumn fx:id="dAppContact" prefWidth="139.20001220703125" text="Contact" />
-                  <TableColumn fx:id="dAppType" prefWidth="117.5999755859375" text="Type" />
-                  <TableColumn fx:id="dAppStartDT" prefWidth="168.0" text="Start Date/Time" />
-                  <TableColumn fx:id="dAppEndDT" prefWidth="165.59991455078125" text="End Date/Time" />
-                  <TableColumn fx:id="dAppCustomerID" prefWidth="94.4000244140625" text="Customer ID" />
-                  <TableColumn fx:id="dAppUserID" prefWidth="94.4000244140625" text="User ID" />
+                  <TableColumn fx:id="dAppTitle" prefWidth="105.60000228881836" text="Title" />
+                  <TableColumn fx:id="dAppDesc" prefWidth="144.00001525878906" text="Description" />
+                  <TableColumn fx:id="dAppLoc" prefWidth="138.4000244140625" text="Location" />
+                  <TableColumn fx:id="dAppContact" prefWidth="149.60003662109375" text="Contact" />
+                  <TableColumn fx:id="dAppType" prefWidth="162.4000244140625" text="Type" />
+                  <TableColumn fx:id="dAppStartDT" prefWidth="165.5999755859375" text="Start Date/Time" />
+                  <TableColumn fx:id="dAppEndDT" prefWidth="172.7999267578125" text="End Date/Time" />
+                  <TableColumn fx:id="dAppCustomerID" prefWidth="106.4000244140625" text="Customer ID" />
                </columns>
             </TableView>
-            <Label fx:id="dashUsername" contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="390.0" text="Appointments for &lt;username&gt;" textAlignment="CENTER" textFill="#0c7604">
+            <Label fx:id="dashUsername" contentDisplay="CENTER" layoutX="14.0" layoutY="228.0" prefHeight="38.0" prefWidth="506.0" text="Upcoming Appointments for &lt;username&gt;" textAlignment="CENTER" textFill="#0c7604">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
-               <font>
-                  <Font name="System Bold" size="14.0" />
-               </font>
-            </Button>
          </AnchorPane>
       </Tab>
       <Tab text="   Appointments   ">
@@ -129,12 +124,12 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Button>
-                  <Button layoutX="1016.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Modify" textFill="#0c7604">
+                  <Button layoutX="1016.0" layoutY="68.0" mnemonicParsing="false" onAction="#updateCustomerAction" prefHeight="30.0" prefWidth="85.0" text="Modify" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Button>
-                  <Button layoutX="914.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Add" textFill="#0c7604">
+                  <Button layoutX="914.0" layoutY="68.0" mnemonicParsing="false" onAction="#newCustomerAction" prefHeight="30.0" prefWidth="85.0" text="Add" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -228,7 +223,7 @@
          </content>
       </Tab>
    </TabPane>
-   <Label alignment="CENTER" layoutX="8.0" layoutY="11.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER" layoutX="453.0" layoutY="14.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
@@ -243,4 +238,10 @@
          <Font name="System Bold" size="14.0" />
       </font>
    </Label>
+   <Button layoutX="1059.0" layoutY="592.0" mnemonicParsing="false" text="Refresh" textFill="#0c7604">
+      <font>
+         <Font name="System Bold" size="14.0" />
+      </font>
+   </Button>
+   <ImageView fx:id="logoImage" fitHeight="66.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true" />
 </AnchorPane>
