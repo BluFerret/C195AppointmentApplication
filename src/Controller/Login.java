@@ -11,9 +11,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -29,6 +33,7 @@ import java.util.ResourceBundle;
  * if the user's computer language setting is set to French. Otherwise, the login view is displayed in English.
  */
 public class Login implements Initializable {
+    @FXML private ImageView logoImage;
     @FXML private Label errorMessage;
     @FXML private TextField userNameText;
     @FXML private TextField passwordText;
@@ -43,6 +48,12 @@ public class Login implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         zoneIDLabel.setText(ZoneId.systemDefault().toString());
+        try{
+            Image logo = new Image(new FileInputStream("src\\Resource\\FGCLogo.jpg"));
+            logoImage.setImage(logo);
+        } catch (FileNotFoundException e) {
+            System.out.println("logo image in resource file has been moved or renamed");
+        }
     }
     /**
      * This method validates a user's attempt at logging in to the application. An error message is displayed if a
@@ -80,6 +91,7 @@ public class Login implements Initializable {
     public void loginButtonAction(ActionEvent e) {
         if (loginValidation()){
             SessionData.setUsernameAndLogs(userNameText.getText());
+            ApplicationMain.setImminentApp();
             Parent root = null;
             try {
                 root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/ApplicationMain.fxml")));

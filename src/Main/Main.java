@@ -9,12 +9,12 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 /**
- * This is an appointment scheduling application for WGU Course C195 created by Lindsey Hill, student ID: #001994073.
- * Please note, these components and functionalities are based on the parameters given for this educational project to
- * show capability and may not represent usual implementation in the real business world. For example, the ability
- * to delete customer data in its entirety from a database would normally not be given to the average user for legal
- * and business reasons.
+ * This is an appointment scheduling application for a fictional global consulting company. This project is for
+ * WGU Course C195 created by Lindsey Hill, student ID: #001994073.
+ *
+ * @author  Lindsey Hill
  */
+//TODO: Write README file
 public class Main extends Application {
     /**
      * This is the method that starts the Login View.

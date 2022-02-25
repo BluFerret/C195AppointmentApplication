@@ -3,17 +3,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.*;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import static java.time.DayOfWeek.*;
+import static java.time.temporal.TemporalAdjusters.nextOrSame;
+import static java.time.temporal.TemporalAdjusters.previousOrSame;
+
+//TODO:javadoc
 public abstract class SessionData {
     private static String userName;
     private static ObservableList<LoginAttempt> loginAttempts;
 
+    // ========== Login and Username ==========
     /**
      * Records the username of the user for the current session. This is only called when username and password have
      * been validated.
@@ -43,9 +46,11 @@ public abstract class SessionData {
             e.printStackTrace();
         }
     }
+    //TODO:javadoc
     public static ObservableList<LoginAttempt> getLoginAttempts() {
         return loginAttempts;
     }
+    //TODO:javadoc
     private static void setLoginAttempts(){
         loginAttempts = FXCollections.observableArrayList();
         try {
@@ -63,6 +68,7 @@ public abstract class SessionData {
             System.out.println("File not found to read");
         }
     }
+    // ========== Time Conversion ==========
     /**
      * Coverts UTC date and time as a string to local date and time as a string.
      * Local time is the local time of the JVM.
@@ -95,6 +101,7 @@ public abstract class SessionData {
         ZonedDateTime convertedTime = originalTime.withZoneSameInstant(toTimeZone);
         return convertedTime.format(formatter);
     }
+    //TODO:javadoc
     public static String convertESTtoLocal(String dateAndTimeEST){
         String format = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
@@ -105,27 +112,60 @@ public abstract class SessionData {
         ZonedDateTime convertedTime = originalTime.withZoneSameInstant(toTimeZone);
         return convertedTime.format(formatter);
     }
+    // ========== Time - Other ==========
+    //TODO:javadoc
     public static String currentTimeUTC(){
         String format = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         String localTimeNow = formatter.format(LocalDateTime.now());
         return convertLocaltoUTC(localTimeNow);
     }
+    //TODO:javadoc
+    public static String fiveteenMinFromNowUTC(){
+        String format = "yyyy-MM-dd HH:mm:ss";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        String localTimeNow = formatter.format(LocalDateTime.now().plusMinutes(15));
+        return convertLocaltoUTC(localTimeNow);
+    }
+    //TODO:javadoc
+    public static String currentWeekStart(){
+        LocalDate today = LocalDate.now();
+        LocalDate sunday = today.with(previousOrSame(SUNDAY));
+        String sundayString = sunday + " 00:00:00";
+        return convertLocaltoUTC(sundayString);
+    }
+    //TODO:javadoc
+    public static String currentWeekEnd(){
+        LocalDate today = LocalDate.now();
+        LocalDate sunday = today.with(nextOrSame(SUNDAY));
+        String sundayString = sunday + " 00:00:00";
+        return convertLocaltoUTC(sundayString);
+    }
+    //TODO:javadoc
+    public static int currentMonth(){
+        LocalDate today = LocalDate.now();
+        return today.getMonthValue();
+    }
+    // ========== Parsing ==========
+    //TODO:javadoc
     public static String parseStringComma(String string){
         int i = string.indexOf(",");
         String parsedString = null;
         if (i!=-1) {parsedString= string.substring(0 , i);}
         return parsedString;
     }
+    //TODO:javadoc
     public static String parseCommaString(String string){
         int i = string.indexOf(",");
         String parsedString = null;
         if (i!=-1) {parsedString= string.substring(i+2);}
         return parsedString;
     }
+    //TODO:javadoc
     public static String parseDateFromDateTime(String dateTime){
         return dateTime.substring(0,10);
     }
+    //TODO:javadoc or delete method?
     public static String parseTimeFromDateTime(String dateTime){
         return dateTime.substring(11);
     }

@@ -30,7 +30,12 @@
                   <TableColumn fx:id="dAppCustomerID" prefWidth="106.4000244140625" text="Customer ID" />
                </columns>
             </TableView>
-            <Label fx:id="dashUsername" contentDisplay="CENTER" layoutX="14.0" layoutY="228.0" prefHeight="38.0" prefWidth="506.0" text="Upcoming Appointments for &lt;username&gt;" textAlignment="CENTER" textFill="#0c7604">
+            <Label fx:id="dashUsername" contentDisplay="CENTER" layoutX="14.0" layoutY="228.0" prefHeight="38.0" prefWidth="506.0" text="Future Appointments for &lt;username&gt;" textAlignment="CENTER" textFill="#0c7604">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="dash15MinLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="361.0" layoutY="89.0" prefHeight="38.0" prefWidth="506.0" text="dash15MinLabel" textAlignment="CENTER" textFill="#0c7604">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -55,7 +60,7 @@
                         <TableColumn fx:id="cAppUserID" prefWidth="94.4000244140625" text="User ID" />
                      </columns>
                   </TableView>
-                  <RadioButton layoutX="555.0" layoutY="29.0" mnemonicParsing="false" text="Current Week" textFill="#0c7604">
+                  <RadioButton fx:id="currentWeekAppointments" layoutX="555.0" layoutY="29.0" mnemonicParsing="false" onAction="#appointmentTabTableUpdate" text="Current Week" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -63,12 +68,12 @@
                         <ToggleGroup fx:id="AppointmentTab1" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton layoutX="705.0" layoutY="29.0" mnemonicParsing="false" text="Current Month" textFill="#0c7604" toggleGroup="$AppointmentTab1">
+                  <RadioButton fx:id="currentMonthAppointments" layoutX="705.0" layoutY="29.0" mnemonicParsing="false" onAction="#appointmentTabTableUpdate" text="Current Month" textFill="#0c7604" toggleGroup="$AppointmentTab1">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </RadioButton>
-                  <RadioButton layoutX="405.0" layoutY="29.0" mnemonicParsing="false" selected="true" text="All Time" textFill="#0c7604" toggleGroup="$AppointmentTab1">
+                  <RadioButton fx:id="allTimeAppointments" layoutX="405.0" layoutY="29.0" mnemonicParsing="false" onAction="#appointmentTabTableUpdate" selected="true" text="All Time" textFill="#0c7604" toggleGroup="$AppointmentTab1">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -78,7 +83,7 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
-                  <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
+                  <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" onAction="#deleteAppointment" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -119,7 +124,7 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
-                  <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
+                  <Button layoutX="1117.0" layoutY="68.0" mnemonicParsing="false" onAction="#deleteCustomer" prefHeight="30.0" prefWidth="85.0" text="Delete" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -190,14 +195,18 @@
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="494.0" prefWidth="1195.0">
                <children>
-                  <Label contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="390.0" text="Reports" textAlignment="CENTER" textFill="#0c7604">
+                  <TableView fx:id="groupCustTable" layoutX="23.0" layoutY="121.0" prefHeight="358.0" prefWidth="1182.0">
+                     <columns>
+                        <TableColumn fx:id="groupCustCountry" prefWidth="349.6000175476074" text="Country" />
+                        <TableColumn fx:id="groupCustDivision" minWidth="0.0" prefWidth="451.20001220703125" text="Division" />
+                        <TableColumn fx:id="groupCustCount" prefWidth="382.4000244140625" text="Count of Customers" />
+                     </columns>
+                  </TableView>
+                  <Label contentDisplay="CENTER" layoutX="14.0" layoutY="63.0" prefHeight="38.0" prefWidth="637.0" text="Customer Count Grouped by Country and Division" textAlignment="CENTER" textFill="#0c7604">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
-                  <Button layoutX="589.0" layoutY="222.0" mnemonicParsing="false" text="Report 2" />
-                  <Button layoutX="233.0" layoutY="222.0" mnemonicParsing="false" text="Report 1" />
-                  <Button layoutX="945.0" layoutY="222.0" mnemonicParsing="false" text="Report 3" />
                </children>
             </AnchorPane>
          </content>
@@ -223,7 +232,7 @@
          </content>
       </Tab>
    </TabPane>
-   <Label alignment="CENTER" layoutX="453.0" layoutY="14.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER" layoutX="81.0" layoutY="14.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
@@ -233,12 +242,12 @@
          <Font name="System Bold" size="14.0" />
       </font>
    </Button>
-   <Label fx:id="errorMessage" alignment="CENTER" layoutX="330.0" layoutY="11.0" prefHeight="38.0" prefWidth="562.0" text="Error Message" textAlignment="CENTER" textFill="#ea1a0b" visible="false">
+   <Label fx:id="errorMessage" alignment="CENTER" layoutX="404.0" layoutY="14.0" prefHeight="38.0" prefWidth="822.0" text="Error Message" textAlignment="CENTER" textFill="#ea1a0b" visible="false">
       <font>
          <Font name="System Bold" size="14.0" />
       </font>
    </Label>
-   <Button layoutX="1059.0" layoutY="592.0" mnemonicParsing="false" text="Refresh" textFill="#0c7604">
+   <Button layoutX="1059.0" layoutY="592.0" mnemonicParsing="false" onAction="#refreshData" text="Refresh" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="14.0" />
       </font>

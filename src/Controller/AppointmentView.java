@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import static java.time.LocalDate.now;
 
+// TODO:Javadoc note
 public class AppointmentView implements Initializable {
     @FXML private Label errorMessage;
     @FXML private TextField appIDText;
@@ -123,7 +124,7 @@ public class AppointmentView implements Initializable {
         currentAppointment = appointment;
         modifyAppointment = true;
     }
-
+    //TODO:javadoc
     private boolean validateAppointment(){
         if(titleText.getText().isEmpty()||descText.getText().isEmpty()||locationText.getText().isEmpty()||typeText.getText().isEmpty()||
                 customerBox.getValue().isEmpty()||contactBox.getValue().isEmpty()||userBox.getValue().isEmpty()||
@@ -159,13 +160,15 @@ public class AppointmentView implements Initializable {
             String endTimeUTC = SessionData.convertLocaltoUTC(endTimeComboBox.getValue());
             boolean overlap = JDBC.appointmentsExistWithinTimeFrameForCustomer(startTimeUTC,
                     endTimeUTC,SessionData.parseCommaString(customerBox.getValue()));
+            if(modifyAppointment){overlap = JDBC.appointmentsExistWithinTimeFrameForCustomer(startTimeUTC,
+                    endTimeUTC,SessionData.parseCommaString(customerBox.getValue()),currentAppointment.getAppID());}
             if(overlap){
                 displayError("Appointment not saved: Customer already has appointment during timeframe");
                 return false;
             }
         return true;
     }
-
+    //TODO:javadoc
     public void saveAppointment(ActionEvent e){
         if(validateAppointment()){
             boolean updated;
@@ -199,7 +202,6 @@ public class AppointmentView implements Initializable {
             else{displayError("SQL error saving appointment, please try again.");}
         }
     }
-
     /**
      * Method to display error message to user. Lambda used for setOnFinished of PauseTransition to return error text
      * to be invisible after 10 seconds.
@@ -212,6 +214,7 @@ public class AppointmentView implements Initializable {
         visibleErrorText.setOnFinished(actionEvent -> errorMessage.setVisible(false));
         visibleErrorText.play();
     }
+    //TODO:javadoc
     public void cancelButtonAction(ActionEvent e) {
         modifyAppointment=false;
         Parent root = null;

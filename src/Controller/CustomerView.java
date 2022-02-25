@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
+//TODO:javadoc
 public class CustomerView implements Initializable {
     @FXML private Label errorMessage;
     @FXML private TextField custIDText;
@@ -35,6 +35,7 @@ public class CustomerView implements Initializable {
     private static boolean modifyCustomer = false;
     private ObservableList<String> firstLvlDivisionList;
 
+    //TODO:javadoc
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ObservableList<String> countryList = JDBC.listOfCountries();
@@ -66,17 +67,19 @@ public class CustomerView implements Initializable {
             phoneText.setText(currentCustomer.getCusPhone());
         }
     }
-
+    //TODO:javadoc
     public static void setUpdateCustomer(Customer customer){
         currentCustomer = customer;
         modifyCustomer = true;
     }
+    //TODO:javadoc
     public void populateFirstLvlDivisionBox(){
         if(!countryBox.getValue().isEmpty()) {
             firstLvlDivisionList = JDBC.listOfFirstLvlDivisions(SessionData.parseCommaString(countryBox.getValue()));
             firstLvlDivisionBox.setItems(firstLvlDivisionList);
         }
     }
+    //TODO:javadoc
     private boolean validateCustomer(){
         boolean valid = true;
         if(nameText.getText().isEmpty()||addressText.getText().isEmpty()||postalCodeText.getText().isEmpty()||
@@ -102,6 +105,7 @@ public class CustomerView implements Initializable {
         }
         return valid;
     }
+    //TODO:javadoc
     public void saveCustomer(ActionEvent e){
         if(validateCustomer()){
             int division = Integer.parseInt(SessionData.parseCommaString(firstLvlDivisionBox.getValue()));

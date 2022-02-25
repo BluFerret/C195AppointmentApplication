@@ -12,18 +12,36 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import static DAO.JDBC.listOfAppointments;
 
+/**
+ * This is the controller class for the ApplicationMain.fxml view. This controls the main application including
+ * the various tabs displaying the user's dashboard, the appointment tab, the customer tab, tabs for reports 1, 2, and
+ * 3, and the logs tab. The user's dashboard displays the upcoming appointments associated with the user who is
+ * currently logged in per the login screen. The appointments tab displays all the appointments for all users and
+ * offers ways for the user to create, update, and delete appointments as well as view appointments by month and
+ * week or by all time. The Customer tab displays all the customers and allows the user to create, update, and
+ * delete customers. The report 1 tab displays the count of appointments groups by type and by month. The report 2 tab
+ * displays a schedule of appointments for each contact. The report 3 tab displays _________________________________.
+ * The logs tab displays all login attempts, when they took place, and if they were successful.
+ */
 public class ApplicationMain implements Initializable {
+    private static boolean imminentApp;
+    @FXML private ImageView logoImage;
     @FXML private Label errorMessage;
     // user dashboard
+    @FXML private Label dash15MinLabel;
     @FXML private Label dashUsername;
     @FXML private TableView<Appointment> dashAppointmentTableView;
     @FXML private TableColumn<Appointment,Integer> dAppID;
@@ -37,7 +55,9 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,Integer> dAppCustomerID;
     private ObservableList<Appointment> dashAppointmentList;
     // appointments
-    @FXML private ToggleGroup AppointmentTab;
+    @FXML private RadioButton allTimeAppointments;
+    @FXML private RadioButton currentWeekAppointments;
+    @FXML private RadioButton currentMonthAppointments;
     @FXML private TableView<Appointment> appointmentTableView;
     @FXML private TableColumn<Appointment,Integer> cAppID;
     @FXML private TableColumn<Appointment,String> cAppTitle;
@@ -67,6 +87,7 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,String> groupAppType;
     @FXML private TableColumn<Appointment,String> groupAppMonth;
     @FXML private TableColumn<Appointment,Integer> groupAppCount;
+    private ObservableList<Appointment> groupAppList;
     // report 2
     @FXML private Label report2Label;
     @FXML private ComboBox<String> contactSelection;
@@ -82,35 +103,35 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<Appointment,Integer> conAppCustomerID;
     @FXML private TableColumn<Appointment,Integer> conAppUserID;
     private ObservableList<Appointment> conAppointmentList;
+    // report 3
+    @FXML private TableView<Customer> groupCustTable;
+    @FXML private TableColumn<Customer, String> groupCustCountry;
+    @FXML private TableColumn<Customer, String> groupCustDivision;
+    @FXML private TableColumn<Customer, Integer> groupCustCount;
+    private ObservableList<Customer> groupCustList;
     // logs
     @FXML private TableView<LoginAttempt> logTableView;
     @FXML private TableColumn<LoginAttempt,String> logUsername;
     @FXML private TableColumn<LoginAttempt,String> logTimestampUTC;
     @FXML private TableColumn<LoginAttempt,String> logAttemptSucessful;
-    public ObservableList<LoginAttempt> loginList;
 
-    // TODO: Customers & appointments can be added, updated, and deleted. When deleting a customer, all of the customer’s
-    //  appointments must be deleted first.
-    //  TODO: When a customer or appointment record is deleted, a custom message should display in the user interface that includes
-    //   appointment type. id, and customer name where applicable.
-    //  TODO: Add user ID to appointments adding/modification.
-    //    TODO: Write code to implement input validation and logical error checks to prevent each of the following
-    //     changes when adding or updating information; display a custom message specific for each error check in the
-    //     user interface: scheduling overlapping appointments for customers.
-    //    TODO: Write code to provide an alert when there is an appointment within 15 minutes of the user’s log-in.
-    //     A custom message should be displayed in the user interface and include the appointment ID, date, and time.
-    //     If the user does not have any appointments within 15 minutes of logging in, display a custom message in the
-    //     user interface indicating there are no upcoming appointments. Note: Since evaluation may be testing your
-    //     application outside of business hours, your alerts must be robust enough to trigger an appointment within
-    //     15 minutes of the local time set on the user’s computer, which may or may not be EST.
-    //    TODO: Write code that generates accurate information in each of the following reports and will display the
-    //     reports in the user interface: an additional report of your choice
-    //    TODO: Write at least two different lambda expressions to improve your code.
     // TODO:Javadoc note
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        updateAppointmentLists();
-        updateCustomerList();
+        try{
+            Image logo = new Image(new FileInputStream("src\\Resource\\FGCLogo.jpg"));
+            logoImage.setImage(logo);
+        } catch (FileNotFoundException e) {
+            System.out.println("logo image in resource file has been moved or renamed");
+        }
+        try{appointmentList = JDBC.listOfAppointmentsAll();}
+        catch (SQLException throwables) {
+            displayError("SQL error: no appointments found, check database connection.");
+        }
+        try{customerList = JDBC.listOfCustomers();} catch (SQLException throwables) {
+            displayError("SQL error: no customers found, check database connection.");
+            throwables.printStackTrace();
+        }
         // user dashboard setup
         dashUsername.setText("Upcoming Appointments for User: "+ SessionData.getUsername());
         dAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
@@ -122,7 +143,7 @@ public class ApplicationMain implements Initializable {
         dAppStartDT.setCellValueFactory(new PropertyValueFactory<>("appStartDateTime"));
         dAppEndDT.setCellValueFactory(new PropertyValueFactory<>("appEndDateTime"));
         dAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
-        dashAppointmentTableView.setItems(dashAppointmentList);
+        userDashUpcomingUpdate();
         // appointment tab setup
         cAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
         cAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
@@ -134,8 +155,7 @@ public class ApplicationMain implements Initializable {
         cAppEndDT.setCellValueFactory(new PropertyValueFactory<>("appEndDateTime"));
         cAppCustomerID.setCellValueFactory(new PropertyValueFactory<>("appCustomerID"));
         cAppUserID.setCellValueFactory(new PropertyValueFactory<>("appUserID"));
-        if(appointmentList.isEmpty()){displayError("No appointments to display");}
-        appointmentTableView.setItems(appointmentList);
+        appointmentTabTableUpdate();
         // customer tab setup
         custID.setCellValueFactory(new PropertyValueFactory<>("cusID"));
         custName.setCellValueFactory(new PropertyValueFactory<>("cusName"));
@@ -146,7 +166,6 @@ public class ApplicationMain implements Initializable {
         custDivID.setCellValueFactory(new PropertyValueFactory<>("cusDivisionCode"));
         custCountry.setCellValueFactory(new PropertyValueFactory<>("cusCountry"));
         custCountryID.setCellValueFactory(new PropertyValueFactory<>("cusCountryCode"));
-        if(customerList.isEmpty()){displayError("No customers to display");}
         customerTableView.setItems(customerList);
         // report 1
         groupAppType.setCellValueFactory(new PropertyValueFactory<>("appType"));
@@ -171,34 +190,52 @@ public class ApplicationMain implements Initializable {
         conAppointmentList=JDBC.report2ScheduleByContact(SessionData.parseStringComma(contactSelection.getValue()));
         contactTableView.setItems(conAppointmentList);
         report2Label.setText("Appointments for "+contactSelection.getValue());
+        // report 3
+        groupCustCountry.setCellValueFactory(new PropertyValueFactory<>("cusCountry"));
+        groupCustDivision.setCellValueFactory(new PropertyValueFactory<>("cusDivision"));
+        groupCustCount.setCellValueFactory(new PropertyValueFactory<>("cusCount"));
+        groupCustList = JDBC.report3CountCustomersByCountryAndDivision();
+        groupCustTable.setItems(groupCustList);
         // logs table setup
-        loginList = SessionData.getLoginAttempts();
+        ObservableList<LoginAttempt> loginList = SessionData.getLoginAttempts();
         logUsername.setCellValueFactory(new PropertyValueFactory<>("userName"));
         logTimestampUTC.setCellValueFactory(new PropertyValueFactory<>("timestampUTC"));
         logAttemptSucessful.setCellValueFactory(new PropertyValueFactory<>("loginSucessful"));
         logTableView.setItems(loginList);
+        fifteenMinAlert();
     }
     // TODO:Javadoc note
-    private void updateAppointmentLists() {
-        try{appointmentList = listOfAppointments();}
-        catch (SQLException throwables) {
-            displayError("There was an error and no appointments could be found, please try again later.");
+    private void userDashUpcomingUpdate(){
+        if(JDBC.appointmentsExistWithin15MinTimeFrameForUser()){
+            dash15MinLabel.setText("User has an appointment within next 15 minutes");
         }
-        try{dashAppointmentList = listOfAppointments(SessionData.getUsername());}
+        else{dash15MinLabel.setText("User has no appointments within next 15 minutes");}
+        try{dashAppointmentList = JDBC.listOfAppointments(SessionData.getUsername());}
         catch (SQLException throwables) {
             throwables.printStackTrace();
+        }
+        dashAppointmentTableView.setItems(dashAppointmentList);
+    }
+    // TODO:Javadoc note
+    public static void setImminentApp(){
+        imminentApp= JDBC.appointmentsExistWithin15MinTimeFrameForUser();
+    }
+    // TODO:Javadoc note
+    private void fifteenMinAlert(){
+        if(imminentApp){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, JDBC.appointmentWithin15MinTimeFrameForUser(), ButtonType.OK);
+            alert.setTitle("Imminent Appointment");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                imminentApp = false;
+            }
         }
     }
     /**
-     * updates the list of customers
+     * This method brings the user to the AppointmentView after saving the currently selected appointment as the
+     * appointment to be updated with the AppointmentView form.
+     * @param e - event of pressing the modify button on the appointment tab
      */
-    private void updateCustomerList(){
-        try{customerList = JDBC.listOfCustomers();} catch (SQLException throwables) {
-            displayError("There was an error pulling the customers from the database");
-            throwables.printStackTrace();
-        }
-    }
-    // TODO:Javadoc note
     public void updateAppointmentAction(ActionEvent e) {
         try {
             AppointmentView.setUpdateAppointment(appointmentTableView.getSelectionModel().getSelectedItem());
@@ -212,7 +249,10 @@ public class ApplicationMain implements Initializable {
             displayError("Something went wrong: Please select an appointment to modify and try again.");
         }
     }
-    // TODO:Javadoc note
+    /**
+     * This method brings the user to the AppointmentView
+     * @param e - event of pressing the add button on the appointment tab
+     */
     public void newAppointmentAction(ActionEvent e){
         try {
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../View/AppointmentView.fxml")));
@@ -224,8 +264,89 @@ public class ApplicationMain implements Initializable {
             displayError("Something went wrong displaying the appointment form.");
         }
     }
-    public void deleteAppointment(){}
-    // TODO:Javadoc note
+    /**
+     * This method gives the user an option to delete an appointment via a pop-up message.
+     */
+    public void deleteAppointment(){
+        if(appointmentTableView.getSelectionModel().isEmpty()){
+            displayError("Please select an appointment to delete and try again.");
+        }
+        else {
+            Appointment appToDelete = appointmentTableView.getSelectionModel().getSelectedItem();
+            String associatedCustomer = Objects.requireNonNull(customerList.stream().filter(customer -> customer.getCusID() == appToDelete.getAppCustomerID())
+                    .findFirst().orElse(null)).getCusName();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete the following appointment?: " +
+                    "\nAppointment " + appToDelete.getAppID() +
+                    ", " + appToDelete.getAppType() +
+                    "\nCustomer " + appToDelete.getAppCustomerID() +
+                    ", " + associatedCustomer, ButtonType.YES, ButtonType.CANCEL);
+            alert.setTitle("Delete Appointment");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == ButtonType.YES) {
+                    if (JDBC.deleteAppointment(appToDelete.getAppID())) {
+                        displayError("Appointment "+appToDelete.getAppID()+", "+appToDelete.getAppType()+" deleted.");
+                    }
+                }
+            }
+            refreshData();
+        }
+    }
+    /**
+     * This method refreshes the data in the various tables and labels across the ApplicationMain View.
+     */
+    public void refreshData(){
+        userDashUpcomingUpdate();
+        try{
+            customerList = JDBC.listOfCustomers();
+            groupAppList = JDBC.report1AppointmentsByMonthAndType();
+            groupCustList = JDBC.report3CountCustomersByCountryAndDivision();
+        }
+        catch (SQLException throwables) {
+            displayError("SQL error: no appointments found, check database connection.");
+        }
+        dashAppointmentTableView.setItems(dashAppointmentList);
+        dashAppointmentTableView.refresh();
+        appointmentTabTableUpdate();
+        customerTableView.setItems(customerList);
+        customerTableView.refresh();
+        groupAppTable.setItems(groupAppList);
+        groupAppTable.refresh();
+        contactSelectAction();
+        groupCustTable.setItems(groupCustList);
+        groupCustTable.refresh();
+    }
+    //TODO:Javadoc
+    public void appointmentTabTableUpdate(){
+        if(allTimeAppointments.isSelected()){
+            try{
+                appointmentList = JDBC.listOfAppointmentsAll();
+            } catch (SQLException throwables) {
+                displayError("SQL error: no appointments found, check database connection.");
+            }
+        }
+        if(currentWeekAppointments.isSelected()){
+            try{
+                appointmentList = JDBC.listOfAppointmentsWeek();
+            } catch (SQLException throwables) {
+                displayError("SQL error: no appointments found, check database connection.");
+            }
+        }
+        if(currentMonthAppointments.isSelected()){
+            try{
+                appointmentList = JDBC.listOfAppointmentsMonth();
+            } catch (SQLException throwables) {
+                displayError("SQL error: no appointments found, check database connection.");
+            }
+        }
+        appointmentTableView.setItems(appointmentList);
+        appointmentTableView.refresh();
+    }
+    /**
+     * This method brings the user to the CustomerView after saving the currently selected customer as the
+     * customer to be updated with the CustomerView form.
+     * @param e - event of pressing the modify button on the customer tab
+     */
     public void updateCustomerAction(ActionEvent e) {
         try {
             CustomerView.setUpdateCustomer(customerTableView.getSelectionModel().getSelectedItem());
@@ -239,7 +360,10 @@ public class ApplicationMain implements Initializable {
             displayError("Something went wrong: Please select a customer to modify and try again.");
         }
     }
-    // TODO:Javadoc note **** possibly replace all new windows with lambdas
+    /**
+     * This method brings the user to the CustomerView
+     * @param e - event of pressing the add button on the customer tab
+     */
     public void newCustomerAction(ActionEvent e){
         try {
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../View/CustomerView.fxml")));
@@ -251,12 +375,42 @@ public class ApplicationMain implements Initializable {
             displayError("Something went wrong displaying the customer form.");
         }
     }
-    // TODO:Javadoc note
+    /**
+     * This method gives the user an option to delete a customer via a pop-up message, provided the customer is valid
+     * to delete.
+     */
+    public void deleteCustomer(){
+        if(customerTableView.getSelectionModel().isEmpty()){
+            displayError("Please select a customer to delete and try again.");
+        }
+        else if(JDBC.customerHasAppointmentsCheck(customerTableView.getSelectionModel().getSelectedItem().getCusID())){
+            displayError("Please delete associated appointments before deleting customer "
+                    +customerTableView.getSelectionModel().getSelectedItem().getCusID()+".");
+        }
+        else {
+            Customer custToDelete = customerTableView.getSelectionModel().getSelectedItem();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete the following customer?: " +
+                    "\nCustomer " + custToDelete.getCusID() +
+                    ", " + custToDelete.getCusName(), ButtonType.YES, ButtonType.CANCEL);
+            alert.setTitle("Delete Customer");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == ButtonType.YES) {
+                    if (JDBC.deleteCustomer(custToDelete.getCusID())) {
+                        displayError("Customer "+custToDelete.getCusID()+", "+custToDelete.getCusName()+" deleted.");
+                    }
+                }
+            }
+            refreshData();
+        }
+    }
+    /**
+     * This method updates the report 2 schedule list based on which contact has been selected from the contact drop down list.
+     */
     public void contactSelectAction(){
         conAppointmentList=JDBC.report2ScheduleByContact(SessionData.parseStringComma(contactSelection.getValue()));
         contactTableView.setItems(conAppointmentList);
         contactTableView.refresh();
-        if(conAppointmentList.isEmpty()){displayError("Report 2- No appointments associated with that contact");}
         report2Label.setText("Appointments for "+contactSelection.getValue());
     }
     /**

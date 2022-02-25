@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="637.0" prefWidth="1229.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AppointmentView">
-    <Label alignment="CENTER" layoutX="56.0" layoutY="11.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
+    <Label alignment="CENTER" layoutX="466.0" layoutY="14.0" prefHeight="38.0" prefWidth="323.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
         <font>
             <Font name="System Bold" size="18.0" />
         </font>
@@ -24,7 +24,7 @@
             <Font name="System Bold" size="14.0" />
         </font>
     </Label>
-   <Label alignment="CENTER" layoutX="57.0" layoutY="45.0" prefHeight="38.0" prefWidth="323.0" text="Appointment" textAlignment="CENTER" textFill="#0c7604">
+   <Label alignment="CENTER" layoutX="467.0" layoutY="48.0" prefHeight="38.0" prefWidth="323.0" text="Appointment" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>

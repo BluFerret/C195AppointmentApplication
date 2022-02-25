@@ -4,9 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.sql.*;
 
-import static javax.swing.UIManager.getInt;
-
-
 /**
  * This Java Database Connection class connects to the local database and sends queries to the database to
  * create, read, update, and delete data. The methods for opening and closing the database connection are paraphrased
@@ -77,7 +74,7 @@ public abstract class JDBC {
      * @return an observable list of appointments with the specifications of the query
      * @throws SQLException from the SQL executeQuery of the statement via database connection - exception handled in ApplicationMain
      */
-    public static ObservableList<Appointment> listOfAppointments() throws SQLException {
+    public static ObservableList<Appointment> listOfAppointmentsAll() throws SQLException {
         ObservableList<Appointment> list = FXCollections.observableArrayList();
         Statement statement = conn.createStatement() ;
         String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, " +
@@ -93,7 +90,7 @@ public abstract class JDBC {
         return list;
     }
     /**
-     * This method queries a list of appointments for a specific username.
+     * This method queries a list of upcoming appointments for a specific username.
      * @param userName - the username being used in the query
      * @return an observable list of appointments with the specifications of the query
      * @throws SQLException from the SQL executeQuery of the statement via database connection - exception handled in ApplicationMain
@@ -103,7 +100,8 @@ public abstract class JDBC {
         Statement statement = conn.createStatement() ;
         String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, users.User_ID, " +
                 "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID JOIN " +
-                "users ON users.User_ID = appointments.User_ID WHERE users.User_Name = \""+userName+"\";";
+                "users ON users.User_ID = appointments.User_ID WHERE users.User_Name = \""+userName+"\" " +
+                "AND Start >= \""+SessionData.currentTimeUTC()+"\";";
         ResultSet rs = statement.executeQuery(q);
         while(rs.next()){
             Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
@@ -115,7 +113,97 @@ public abstract class JDBC {
         return list;
     }
     /**
-     * This method executes a query to see if an appointment already exists for a certain customer within the time frame provided.
+     * This method queries a list of all appointments.
+     * @return an observable list of appointments with the specifications of the query
+     * @throws SQLException from the SQL executeQuery of the statement via database connection - exception handled in ApplicationMain
+     */
+    public static ObservableList<Appointment> listOfAppointmentsWeek() throws SQLException {
+        ObservableList<Appointment> list = FXCollections.observableArrayList();
+        String weekStart = SessionData.currentWeekStart();
+        String weekEnd = SessionData.currentWeekEnd();
+        Statement statement = conn.createStatement() ;
+        String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, " +
+                "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID " +
+                "WHERE Start >= \""+weekStart+"\" AND End < \""+weekEnd+"\";";
+        ResultSet rs = statement.executeQuery(q);
+        while(rs.next()){
+            Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
+                    rs.getString("Description"), rs.getString("Location"),rs.getString("Type"),
+                    rs.getString("Start"),rs.getString("End"),rs.getInt("Customer_ID"),
+                    rs.getInt("User_ID"),rs.getString("Contact_Name"));
+            list.add(appointment);
+        }
+        return list;
+    }
+    /**
+     * This method queries a list of all appointments.
+     * @return an observable list of appointments with the specifications of the query
+     * @throws SQLException from the SQL executeQuery of the statement via database connection - exception handled in ApplicationMain
+     */
+    public static ObservableList<Appointment> listOfAppointmentsMonth() throws SQLException {
+        ObservableList<Appointment> list = FXCollections.observableArrayList();
+        int month = SessionData.currentMonth();
+        Statement statement = conn.createStatement() ;
+        String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, " +
+                "Contact_Name, MONTH(Start) FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID " +
+                "WHERE MONTH(Start) = "+month+";";
+        ResultSet rs = statement.executeQuery(q);
+        while(rs.next()){
+            Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
+                    rs.getString("Description"), rs.getString("Location"),rs.getString("Type"),
+                    rs.getString("Start"),rs.getString("End"),rs.getInt("Customer_ID"),
+                    rs.getInt("User_ID"),rs.getString("Contact_Name"));
+            list.add(appointment);
+        }
+        return list;
+    }
+    //TODO: Javadoc note
+    public static boolean appointmentsExistWithin15MinTimeFrameForUser(){
+        boolean result = true;
+        String start = SessionData.currentTimeUTC();
+        String end = SessionData.fiveteenMinFromNowUTC();
+        String username = SessionData.getUsername();
+        try{
+            Statement statement = conn.createStatement() ;
+            String q = "SELECT COUNT(*) FROM appointments " +
+                    "JOIN users ON users.User_ID = appointments.User_ID " +
+                    "WHERE users.User_Name = \""+username+"\" AND Start >= \""+start+"\" AND Start <= \""+end+"\";";
+            ResultSet rs = statement.executeQuery(q);
+            while(rs.next()){
+                result = rs.getInt("COUNT(*)")!=0;}
+            rs.close();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return result;
+    }
+    //TODO:javadoc
+    public static String appointmentWithin15MinTimeFrameForUser(){
+        String result = "";
+        String start = SessionData.currentTimeUTC();
+        String end = SessionData.fiveteenMinFromNowUTC();
+        String username = SessionData.getUsername();
+        try{
+            Statement statement = conn.createStatement() ;
+            String q = "SELECT Appointment_ID, Start FROM appointments " +
+                    "JOIN users ON users.User_ID = appointments.User_ID " +
+                    "WHERE users.User_Name = \""+username+"\" AND Start >= \""+start+"\" AND Start <= \""+end+"\" ORDER BY Start;";
+            ResultSet rs = statement.executeQuery(q);
+            while(rs.next()) {
+                result = "Appointment " + rs.getInt("Appointment_ID") + " starting at " +
+                        SessionData.convertUTCtoLocal(rs.getString("Start"));
+            }
+            rs.close();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return result;
+    }
+    /**
+     * This method executes a query to see if an appointment already exists for a certain customer within the time
+     * frame provided. This method is for new appointments only.
      * @param start - the start date and time provided to be checked, date and time provided in UTC timezone.
      * @param end - the end date and time provided to be checked, date and time provided in UTC timezone.
      * @param customerID - the ID number of the customer provided, should be supplied stored as a string.
@@ -131,6 +219,31 @@ public abstract class JDBC {
                 result = rs.getInt("COUNT(*)")!=0;}
                 rs.close();
             }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return result;
+    }
+    /**
+     * This overloaded method executes a query to see if an appointment already exists for a certain customer within
+     * the time frame provided. This method is for updating appointments only, not new appointments.
+     * @param start - the start date and time provided to be checked, date and time provided in UTC timezone.
+     * @param end - the end date and time provided to be checked, date and time provided in UTC timezone.
+     * @param customerID - the ID number of the customer provided, should be supplied stored as a string.
+     * @param appointmentID - the ID number of the appointment being updated (so it can be excluded from the search).
+     * @return a boolean indicating if an appointment already exists for the customer ID provided that overlaps with the start and end dates provided.
+     */
+    public static boolean appointmentsExistWithinTimeFrameForCustomer(String start, String end, String customerID, int appointmentID){
+        boolean result = true;
+        try{
+            Statement statement = conn.createStatement() ;
+            String q = "SELECT COUNT(*) FROM appointments WHERE Customer_ID = "+customerID+" AND Appointment_ID != "+appointmentID+
+                    " AND (\""+start+"\" <= End) AND (Start <= \""+end+"\");";
+            ResultSet rs = statement.executeQuery(q);
+            while(rs.next()){
+                result = rs.getInt("COUNT(*)")!=0;}
+            rs.close();
+        }
         catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -167,6 +280,21 @@ public abstract class JDBC {
         }
         return true;
     }
+    /**
+     * This method executes a query to update an appointment. Updates will need to be validated before this
+     * method is called.
+     * @param appID - ID number of the appointment
+     * @param title - title of appointment
+     * @param desc - description of appointment
+     * @param location - location of appointment
+     * @param type - type of appointment
+     * @param start - start date and time of appointment
+     * @param end - end date and time of appointment
+     * @param customerID - customer ID associated with appointment
+     * @param userID - user ID associated with appointment
+     * @param contactID - contact ID associated with appointment
+     * @return boolean indicating if new appointment was added correctly
+     */
     public static boolean updateAppointment(int appID, String title, String desc, String location, String type, String start, String end,
                                             String customerID, String userID, String contactID) {
         try {
@@ -240,7 +368,7 @@ public abstract class JDBC {
         }
         return list;
     }
-    //TODO: finish this query - still appointments
+    //TODO: Javadoc note
     public static boolean addNewCustomer(String name, String address, String postalCode, String phone, int division) {
         try {
             Statement statement = conn.createStatement();
@@ -256,6 +384,7 @@ public abstract class JDBC {
         }
         return true;
     }
+    //TODO: Javadoc note
     public static boolean updateCustomer(int customerID, String name, String address, String postalCode, String phone, int division) {
         try {
             Statement statement = conn.createStatement();
@@ -285,9 +414,9 @@ public abstract class JDBC {
     public static boolean customerHasAppointmentsCheck(int customerID) {
         try {
             Statement statement = conn.createStatement();
-            String q = "SELECT Customer_ID FROM appointments WHERE Customer_ID = " + customerID + ";";
+            String q = "SELECT COUNT(*) FROM appointments WHERE Customer_ID = " + customerID + ";";
             ResultSet rs = statement.executeQuery(q);
-            if (!rs.next()) {
+            if (rs.next() && rs.getInt("COUNT(*)")>0){
                 return true;
             }
         } catch (SQLException throwables) {
@@ -374,6 +503,26 @@ public abstract class JDBC {
         }
         catch (SQLException t) {
             t.printStackTrace();
+        }
+        return list;
+    }
+    //TODO Javadoc note
+    public static ObservableList<Customer> report3CountCustomersByCountryAndDivision(){
+        ObservableList<Customer> list = FXCollections.observableArrayList();
+        try {
+            Statement statement = conn.createStatement();
+            String q = "SELECT Country, Division, COUNT(customers.Customer_ID) AS \"Count\" FROM customers" +
+                    " JOIN first_level_divisions ON first_level_divisions.Division_ID = customers.Division_ID" +
+                    " JOIN countries ON first_level_divisions.Country_ID = countries.Country_ID" +
+                    " group by Country, Division;";
+            ResultSet rs = statement.executeQuery(q);
+            while (rs.next()) {
+                Customer customer = new Customer(rs.getString("Country"), rs.getString("Division"),
+                        rs.getInt("Count"));
+                list.add(customer);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return list;
     }
