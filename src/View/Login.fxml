@@ -8,32 +8,32 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="358.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.Login">
-   <TextField fx:id="userNameText" layoutX="168.0" layoutY="128.0" prefHeight="40.0" prefWidth="327.0">
+   <TextField fx:id="userNameText" layoutX="168.0" layoutY="128.0" prefHeight="40.0" prefWidth="398.0">
       <font>
          <Font size="18.0" />
       </font>
    </TextField>
-   <Label alignment="CENTER" layoutX="60.0" layoutY="129.0" prefHeight="38.0" prefWidth="108.0" text="Username" textAlignment="CENTER" textFill="#0c7604">
+   <Label fx:id="usernameLabel" alignment="CENTER_RIGHT" layoutX="-2.0" layoutY="129.0" prefHeight="38.0" prefWidth="163.0" text="\%username" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <TextField fx:id="passwordText" layoutX="168.0" layoutY="184.0" prefHeight="40.0" prefWidth="327.0">
+   <TextField fx:id="passwordText" layoutX="168.0" layoutY="184.0" prefHeight="40.0" prefWidth="398.0">
       <font>
          <Font size="18.0" />
       </font>
    </TextField>
-   <Label alignment="CENTER" layoutX="60.0" layoutY="185.0" prefHeight="38.0" prefWidth="108.0" text="Password" textAlignment="CENTER" textFill="#0c7604">
+   <Label fx:id="passwordLabel" alignment="CENTER_RIGHT" layoutX="-2.0" layoutY="185.0" prefHeight="38.0" prefWidth="163.0" text="\%password" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <Label layoutX="166.0" layoutY="63.0" prefHeight="38.0" prefWidth="422.0" text="Fictional Global Consulting Company" textAlignment="CENTER" textFill="#0c7604">
+   <Label fx:id="companyLabel" layoutX="166.0" layoutY="63.0" prefHeight="38.0" prefWidth="422.0" text="\%companyName" textAlignment="CENTER" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="18.0" />
       </font>
    </Label>
-   <Button layoutX="372.0" layoutY="244.0" mnemonicParsing="false" onAction="#loginButtonAction" text="Login" textFill="#0c7604">
+   <Button fx:id="loginButton" layoutX="307.0" layoutY="244.0" mnemonicParsing="false" onAction="#loginButtonAction" prefHeight="30.0" prefWidth="108.0" text="\%login" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="14.0" />
       </font>
@@ -48,7 +48,7 @@
          <Font name="System Bold" size="14.0" />
       </font>
    </Label>
-   <Button layoutX="449.0" layoutY="244.0" mnemonicParsing="false" onAction="#exitButtonAction" text="Exit" textFill="#0c7604">
+   <Button fx:id="exitButton" layoutX="458.0" layoutY="244.0" mnemonicParsing="false" onAction="#exitButtonAction" prefHeight="30.0" prefWidth="108.0" text="\%exit" textFill="#0c7604">
       <font>
          <Font name="System Bold" size="14.0" />
       </font>

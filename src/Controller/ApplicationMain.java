@@ -115,11 +115,16 @@ public class ApplicationMain implements Initializable {
     @FXML private TableColumn<LoginAttempt,String> logTimestampUTC;
     @FXML private TableColumn<LoginAttempt,String> logAttemptSucessful;
 
-    // TODO:Javadoc note
+    // ========== Initialization and data refresh ==========
+    /**
+     * This method initializes the main screen of the application by populating tables, labels, and comboboxes to a default setting.
+     * @param url - possible url location for root object if provided, null if not needed.
+     * @param resourceBundle - possible resources for root object, null if not needed.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try{
-            Image logo = new Image(new FileInputStream("src\\Resource\\FGCLogo.jpg"));
+            Image logo = new Image(new FileInputStream("src\\Resources\\FGCLogo.jpg"));
             logoImage.setImage(logo);
         } catch (FileNotFoundException e) {
             System.out.println("logo image in resource file has been moved or renamed");
@@ -133,7 +138,7 @@ public class ApplicationMain implements Initializable {
             throwables.printStackTrace();
         }
         // user dashboard setup
-        dashUsername.setText("Upcoming Appointments for User: "+ SessionData.getUsername());
+        dashUsername.setText("Future Appointments for User: "+ SessionData.getUsername());
         dAppID.setCellValueFactory(new PropertyValueFactory<>("appID"));
         dAppTitle.setCellValueFactory(new PropertyValueFactory<>("appTitle"));
         dAppDesc.setCellValueFactory(new PropertyValueFactory<>("appDesc"));
@@ -204,7 +209,43 @@ public class ApplicationMain implements Initializable {
         logTableView.setItems(loginList);
         fifteenMinAlert();
     }
-    // TODO:Javadoc note
+    /**
+     * This method refreshes the data in the various tables and labels across the ApplicationMain View.
+     */
+    public void refreshData(){
+        userDashUpcomingUpdate();
+        try{
+            customerList = JDBC.listOfCustomers();
+            groupAppList = JDBC.report1AppointmentsByMonthAndType();
+            groupCustList = JDBC.report3CountCustomersByCountryAndDivision();
+        }
+        catch (SQLException throwables) {
+            displayError("SQL error: no appointments found, check database connection.");
+        }
+        dashAppointmentTableView.setItems(dashAppointmentList);
+        dashAppointmentTableView.refresh();
+        appointmentTabTableUpdate();
+        customerTableView.setItems(customerList);
+        customerTableView.refresh();
+        groupAppTable.setItems(groupAppList);
+        groupAppTable.refresh();
+        contactSelectAction();
+        groupCustTable.setItems(groupCustList);
+        groupCustTable.refresh();
+    }
+    /**
+     * This method updates the report 2 schedule list based on which contact has been selected from the contact drop down list.
+     */
+    public void contactSelectAction(){
+        conAppointmentList=JDBC.report2ScheduleByContact(SessionData.parseStringComma(contactSelection.getValue()));
+        contactTableView.setItems(conAppointmentList);
+        contactTableView.refresh();
+        report2Label.setText("Appointments for "+contactSelection.getValue());
+    }
+    /**
+     * This method updated the user's dashboard tab to display any future appointments associated with the user and give
+     * notice in the UI whether an appointment is coming up within 15 minutes.
+     */
     private void userDashUpcomingUpdate(){
         if(JDBC.appointmentsExistWithin15MinTimeFrameForUser()){
             dash15MinLabel.setText("User has an appointment within next 15 minutes");
@@ -216,11 +257,43 @@ public class ApplicationMain implements Initializable {
         }
         dashAppointmentTableView.setItems(dashAppointmentList);
     }
-    // TODO:Javadoc note
+    /**
+     * This method populates the appointment table based on the current selection of the radio buttons on the appointment tab.
+     */
+    public void appointmentTabTableUpdate(){
+        if(allTimeAppointments.isSelected()){
+            try{
+                appointmentList = JDBC.listOfAppointmentsAll();
+            } catch (SQLException throwables) {
+                displayError("SQL error: no appointments found, check database connection.");
+            }
+        }
+        if(currentWeekAppointments.isSelected()){
+            try{
+                appointmentList = JDBC.listOfAppointmentsWeek();
+            } catch (SQLException throwables) {
+                displayError("SQL error: no appointments found, check database connection.");
+            }
+        }
+        if(currentMonthAppointments.isSelected()){
+            try{
+                appointmentList = JDBC.listOfAppointmentsMonth();
+            } catch (SQLException throwables) {
+                displayError("SQL error: no appointments found, check database connection.");
+            }
+        }
+        appointmentTableView.setItems(appointmentList);
+        appointmentTableView.refresh();
+    }
+    /**
+     * This method is called when successfully logging in to check if the user has an appointment within 15 minutes so an alert can be generated.
+     */
     public static void setImminentApp(){
         imminentApp= JDBC.appointmentsExistWithin15MinTimeFrameForUser();
     }
-    // TODO:Javadoc note
+    /**
+     * This method generates an alert when a user is associated with an appointment within 15 minutes of logging in to the application.
+     */
     private void fifteenMinAlert(){
         if(imminentApp){
             Alert alert = new Alert(Alert.AlertType.INFORMATION, JDBC.appointmentWithin15MinTimeFrameForUser(), ButtonType.OK);
@@ -231,6 +304,8 @@ public class ApplicationMain implements Initializable {
             }
         }
     }
+
+    // ========== appointment actions ==========
     /**
      * This method brings the user to the AppointmentView after saving the currently selected appointment as the
      * appointment to be updated with the AppointmentView form.
@@ -292,56 +367,8 @@ public class ApplicationMain implements Initializable {
             refreshData();
         }
     }
-    /**
-     * This method refreshes the data in the various tables and labels across the ApplicationMain View.
-     */
-    public void refreshData(){
-        userDashUpcomingUpdate();
-        try{
-            customerList = JDBC.listOfCustomers();
-            groupAppList = JDBC.report1AppointmentsByMonthAndType();
-            groupCustList = JDBC.report3CountCustomersByCountryAndDivision();
-        }
-        catch (SQLException throwables) {
-            displayError("SQL error: no appointments found, check database connection.");
-        }
-        dashAppointmentTableView.setItems(dashAppointmentList);
-        dashAppointmentTableView.refresh();
-        appointmentTabTableUpdate();
-        customerTableView.setItems(customerList);
-        customerTableView.refresh();
-        groupAppTable.setItems(groupAppList);
-        groupAppTable.refresh();
-        contactSelectAction();
-        groupCustTable.setItems(groupCustList);
-        groupCustTable.refresh();
-    }
-    //TODO:Javadoc
-    public void appointmentTabTableUpdate(){
-        if(allTimeAppointments.isSelected()){
-            try{
-                appointmentList = JDBC.listOfAppointmentsAll();
-            } catch (SQLException throwables) {
-                displayError("SQL error: no appointments found, check database connection.");
-            }
-        }
-        if(currentWeekAppointments.isSelected()){
-            try{
-                appointmentList = JDBC.listOfAppointmentsWeek();
-            } catch (SQLException throwables) {
-                displayError("SQL error: no appointments found, check database connection.");
-            }
-        }
-        if(currentMonthAppointments.isSelected()){
-            try{
-                appointmentList = JDBC.listOfAppointmentsMonth();
-            } catch (SQLException throwables) {
-                displayError("SQL error: no appointments found, check database connection.");
-            }
-        }
-        appointmentTableView.setItems(appointmentList);
-        appointmentTableView.refresh();
-    }
+
+    // ========== customer actions ==========
     /**
      * This method brings the user to the CustomerView after saving the currently selected customer as the
      * customer to be updated with the CustomerView form.
@@ -404,15 +431,8 @@ public class ApplicationMain implements Initializable {
             refreshData();
         }
     }
-    /**
-     * This method updates the report 2 schedule list based on which contact has been selected from the contact drop down list.
-     */
-    public void contactSelectAction(){
-        conAppointmentList=JDBC.report2ScheduleByContact(SessionData.parseStringComma(contactSelection.getValue()));
-        contactTableView.setItems(conAppointmentList);
-        contactTableView.refresh();
-        report2Label.setText("Appointments for "+contactSelection.getValue());
-    }
+
+    // ========== application exit and error display ==========
     /**
      * Method to display error message to user. Lambda used for setOnFinished of PauseTransition to return error text
      * to be invisible after 10 seconds.

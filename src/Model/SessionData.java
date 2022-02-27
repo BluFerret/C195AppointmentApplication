@@ -11,7 +11,10 @@ import static java.time.DayOfWeek.*;
 import static java.time.temporal.TemporalAdjusters.nextOrSame;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
-//TODO:javadoc
+/**
+ * This class holds relevant session data as well as being the point of conversion of time for the user's session and
+ * the parsing of strings formatted to show additional information during the application session.
+ */
 public abstract class SessionData {
     private static String userName;
     private static ObservableList<LoginAttempt> loginAttempts;
@@ -33,7 +36,11 @@ public abstract class SessionData {
     public static String getUsername(){
         return userName;
     }
-    //TODO: record login javadoc
+    /**
+     * This method records a login attempt to a text file.
+     * @param userName - the username of the login attempt
+     * @param successfulLogin - the boolean indicating if the login attempt was successful
+     */
     public static void recordLoginAttempt(String userName, boolean successfulLogin){
         try{
             String format = "yyyy-MM-dd HH:mm:ss";
@@ -46,11 +53,16 @@ public abstract class SessionData {
             e.printStackTrace();
         }
     }
-    //TODO:javadoc
+    /**
+     * This method is the getter for the login attempt list.
+     * @return - login attempt list in an Observable list
+     */
     public static ObservableList<LoginAttempt> getLoginAttempts() {
         return loginAttempts;
     }
-    //TODO:javadoc
+    /**
+     * This method is the setter for the login attempt list as pulled from the login_logs text document
+     */
     private static void setLoginAttempts(){
         loginAttempts = FXCollections.observableArrayList();
         try {
@@ -70,7 +82,7 @@ public abstract class SessionData {
     }
     // ========== Time Conversion ==========
     /**
-     * Coverts UTC date and time as a string to local date and time as a string.
+     * This method coverts UTC date and time as a string to local date and time as a string.
      * Local time is the local time of the JVM.
      * @param dateAndTimeUTC - a string containing the date and time in UTC timezone
      * @return a string containing the date and time provided but converted to the local timezone
@@ -86,7 +98,7 @@ public abstract class SessionData {
         return convertedTime.format(formatter);
     }
     /**
-     * Coverts local date and time as a string to UTC date and time as a string.
+     * This method coverts local date and time as a string to UTC date and time as a string.
      * Local time is the local time of the JVM.
      * @param dateAndTimeLocal - a string containing the date and time in local timezone
      * @return a string containing the date and time provided but converted to UTC timezone
@@ -101,7 +113,12 @@ public abstract class SessionData {
         ZonedDateTime convertedTime = originalTime.withZoneSameInstant(toTimeZone);
         return convertedTime.format(formatter);
     }
-    //TODO:javadoc
+    /**
+     * This method coverts EST date and time as a string to local date and time as a string.
+     * Local time is the local time of the JVM.
+     * @param dateAndTimeEST - a string containing the date and time in EST timezone
+     * @return a string containing the date and time provided but converted to local timezone
+     */
     public static String convertESTtoLocal(String dateAndTimeEST){
         String format = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
@@ -113,60 +130,83 @@ public abstract class SessionData {
         return convertedTime.format(formatter);
     }
     // ========== Time - Other ==========
-    //TODO:javadoc
+    /**
+     * This method provides the current time and date in UTC timezone.
+     * @return - current time and date in UTC timezone as a string
+     */
     public static String currentTimeUTC(){
         String format = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         String localTimeNow = formatter.format(LocalDateTime.now());
         return convertLocaltoUTC(localTimeNow);
     }
-    //TODO:javadoc
-    public static String fiveteenMinFromNowUTC(){
+    /**
+     * This method provides the time and date 15 minutes from the current time and date in UTC timezone.
+     * @return - time and date 15 minutes from now in UTC timezone as a string
+     */
+    public static String fifteenMinFromNowUTC(){
         String format = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         String localTimeNow = formatter.format(LocalDateTime.now().plusMinutes(15));
         return convertLocaltoUTC(localTimeNow);
     }
-    //TODO:javadoc
+    /**
+     * This method provides the starting date and time of the week as a string.
+     * @return the starting date and time of the week as a string
+     */
     public static String currentWeekStart(){
         LocalDate today = LocalDate.now();
         LocalDate sunday = today.with(previousOrSame(SUNDAY));
         String sundayString = sunday + " 00:00:00";
         return convertLocaltoUTC(sundayString);
     }
-    //TODO:javadoc
+    /**
+     * This method provides the ending date and time of the week as a string.
+     * @return the ending date and time of the week as a string
+     */
     public static String currentWeekEnd(){
         LocalDate today = LocalDate.now();
         LocalDate sunday = today.with(nextOrSame(SUNDAY));
         String sundayString = sunday + " 00:00:00";
         return convertLocaltoUTC(sundayString);
     }
-    //TODO:javadoc
+    /**
+     * This method provides the current month as an integer.
+     * @return - the current month as an integer
+     */
     public static int currentMonth(){
         LocalDate today = LocalDate.now();
         return today.getMonthValue();
     }
     // ========== Parsing ==========
-    //TODO:javadoc
+    /**
+     * This method parses a string from the beginning to a comma delimiter.
+     * @param string - the string to be parsed up until the comma
+     * @return - the first portion of the provided string until but not including the comma
+     */
     public static String parseStringComma(String string){
         int i = string.indexOf(",");
         String parsedString = null;
         if (i!=-1) {parsedString= string.substring(0 , i);}
         return parsedString;
     }
-    //TODO:javadoc
+    /**
+     * This method parses a string from a comma delimiter till the end of the string, not including a space after the comma.
+     * @param string - the string to be parsed after the comma and space delimiter
+     * @return - the latter portion of the provided string after a comma and space delimiter
+     */
     public static String parseCommaString(String string){
         int i = string.indexOf(",");
         String parsedString = null;
         if (i!=-1) {parsedString= string.substring(i+2);}
         return parsedString;
     }
-    //TODO:javadoc
+    /**
+     * This method parses the date from a string containing a date and time.
+     * @param dateTime - the string containing the date and time
+     * @return - the date from the data and time provided, as a string
+     */
     public static String parseDateFromDateTime(String dateTime){
         return dateTime.substring(0,10);
-    }
-    //TODO:javadoc or delete method?
-    public static String parseTimeFromDateTime(String dateTime){
-        return dateTime.substring(11);
     }
 }

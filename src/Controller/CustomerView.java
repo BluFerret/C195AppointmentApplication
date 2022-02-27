@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
-//TODO:javadoc
+/**
+ * This is the controller class for CustomerView.fxml. This provides the fields to update or add a new customer.
+ */
 public class CustomerView implements Initializable {
     @FXML private Label errorMessage;
     @FXML private TextField custIDText;
@@ -35,7 +37,12 @@ public class CustomerView implements Initializable {
     private static boolean modifyCustomer = false;
     private ObservableList<String> firstLvlDivisionList;
 
-    //TODO:javadoc
+    /**
+     * This method initializes the CustomerView of the application by populating textviews and comboboxes
+     * accordingly depending on if the customer is new or being updated.
+     * @param url - possible url location for root object if provided, null if not needed.
+     * @param resourceBundle - possible resources for root object, null if not needed.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ObservableList<String> countryList = JDBC.listOfCountries();
@@ -67,19 +74,27 @@ public class CustomerView implements Initializable {
             phoneText.setText(currentCustomer.getCusPhone());
         }
     }
-    //TODO:javadoc
+    /**
+     * This method indicates that a customer is being updated instead of a new customer being made.
+     * @param customer - customer being updated that is passed from ApplicationMain
+     */
     public static void setUpdateCustomer(Customer customer){
         currentCustomer = customer;
         modifyCustomer = true;
     }
-    //TODO:javadoc
+    /**
+     * This method populates the first level division combobox depending on the country choice provided.
+     */
     public void populateFirstLvlDivisionBox(){
         if(!countryBox.getValue().isEmpty()) {
             firstLvlDivisionList = JDBC.listOfFirstLvlDivisions(SessionData.parseCommaString(countryBox.getValue()));
             firstLvlDivisionBox.setItems(firstLvlDivisionList);
         }
     }
-    //TODO:javadoc
+    /**
+     * This method validates that the customer values are valid and all fields are provided.
+     * @return - a boolean indicating if the customer values provided are valid or not.
+     */
     private boolean validateCustomer(){
         boolean valid = true;
         if(nameText.getText().isEmpty()||addressText.getText().isEmpty()||postalCodeText.getText().isEmpty()||
@@ -105,7 +120,11 @@ public class CustomerView implements Initializable {
         }
         return valid;
     }
-    //TODO:javadoc
+    /**
+     * This method saves a valid customer and returns the user to the ApplicationMain view or generates an error
+     * message if the customer is not valid.
+     * @param e - event of clicking the save button.
+     */
     public void saveCustomer(ActionEvent e){
         if(validateCustomer()){
             int division = Integer.parseInt(SessionData.parseCommaString(firstLvlDivisionBox.getValue()));
@@ -147,7 +166,8 @@ public class CustomerView implements Initializable {
         visibleErrorText.play();
     }
     /**
-     * This method is called when the exit button is clicked. This closes the connection to the database and exits the program.
+     * This method returns the user to the ApplicationMain view.
+     * @param e - event of clicking the cancel button.
      */
     public void cancelButtonAction(ActionEvent e) {
         modifyCustomer=false;

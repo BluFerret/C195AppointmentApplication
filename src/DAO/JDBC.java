@@ -9,7 +9,6 @@ import java.sql.*;
  * create, read, update, and delete data. The methods for opening and closing the database connection are paraphrased
  * from code snippets from WGU course C195 code repository.
  */
-//TODO: Make sure result sets are all closed on competing any queries.
 public abstract class JDBC {
     private static final String protocol = "jdbc";
     private static final String vendor = ":mysql:";
@@ -18,7 +17,7 @@ public abstract class JDBC {
     private static final String jdbcUrl = protocol + vendor + location + databaseName + "?connectionTimeZone = SERVER";
     private static final String driver = "com.mysql.cj.jdbc.Driver";
     private static final String accessUserName = "sqlUser";
-    public static Connection conn;
+    private static Connection conn;
 
     // ========== Database Connection and App Login ==========
     /**
@@ -78,7 +77,7 @@ public abstract class JDBC {
         ObservableList<Appointment> list = FXCollections.observableArrayList();
         Statement statement = conn.createStatement() ;
         String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, " +
-                "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID;";
+                "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID ORDER BY Start;";
         ResultSet rs = statement.executeQuery(q);
         while(rs.next()){
             Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
@@ -87,6 +86,7 @@ public abstract class JDBC {
                     rs.getInt("User_ID"),rs.getString("Contact_Name"));
             list.add(appointment);
         }
+        rs.close();
         return list;
     }
     /**
@@ -101,7 +101,7 @@ public abstract class JDBC {
         String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, users.User_ID, " +
                 "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID JOIN " +
                 "users ON users.User_ID = appointments.User_ID WHERE users.User_Name = \""+userName+"\" " +
-                "AND Start >= \""+SessionData.currentTimeUTC()+"\";";
+                "AND Start >= \""+SessionData.currentTimeUTC()+"\" ORDER BY Start;";
         ResultSet rs = statement.executeQuery(q);
         while(rs.next()){
             Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
@@ -110,6 +110,7 @@ public abstract class JDBC {
                     rs.getInt("User_ID"),rs.getString("Contact_Name"));
             list.add(appointment);
         }
+        rs.close();
         return list;
     }
     /**
@@ -124,7 +125,7 @@ public abstract class JDBC {
         Statement statement = conn.createStatement() ;
         String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, " +
                 "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID " +
-                "WHERE Start >= \""+weekStart+"\" AND End < \""+weekEnd+"\";";
+                "WHERE Start >= \""+weekStart+"\" AND End < \""+weekEnd+"\" ORDER BY Start;";
         ResultSet rs = statement.executeQuery(q);
         while(rs.next()){
             Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
@@ -133,6 +134,7 @@ public abstract class JDBC {
                     rs.getInt("User_ID"),rs.getString("Contact_Name"));
             list.add(appointment);
         }
+        rs.close();
         return list;
     }
     /**
@@ -146,7 +148,7 @@ public abstract class JDBC {
         Statement statement = conn.createStatement() ;
         String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, User_ID, " +
                 "Contact_Name, MONTH(Start) FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID " +
-                "WHERE MONTH(Start) = "+month+";";
+                "WHERE MONTH(Start) = "+month+" ORDER BY Start;";
         ResultSet rs = statement.executeQuery(q);
         while(rs.next()){
             Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
@@ -155,13 +157,17 @@ public abstract class JDBC {
                     rs.getInt("User_ID"),rs.getString("Contact_Name"));
             list.add(appointment);
         }
+        rs.close();
         return list;
     }
-    //TODO: Javadoc note
+    /**
+     * This method indicates if an appointment for the user exists within 15 minutes of the current time.
+     * @return - a boolean that indicates whether an appointment exists for the user within 15 minutes of the current time.
+     */
     public static boolean appointmentsExistWithin15MinTimeFrameForUser(){
         boolean result = true;
         String start = SessionData.currentTimeUTC();
-        String end = SessionData.fiveteenMinFromNowUTC();
+        String end = SessionData.fifteenMinFromNowUTC();
         String username = SessionData.getUsername();
         try{
             Statement statement = conn.createStatement() ;
@@ -178,11 +184,15 @@ public abstract class JDBC {
         }
         return result;
     }
-    //TODO:javadoc
+    /**
+     * This method creates a string with the Appointment ID and start time for the appointment within 15 minutes for
+     * the user.
+     * @return - a string with the Appointment ID and start time of the appointment within 15 minutes for the user.
+     */
     public static String appointmentWithin15MinTimeFrameForUser(){
         String result = "";
         String start = SessionData.currentTimeUTC();
-        String end = SessionData.fiveteenMinFromNowUTC();
+        String end = SessionData.fifteenMinFromNowUTC();
         String username = SessionData.getUsername();
         try{
             Statement statement = conn.createStatement() ;
@@ -340,7 +350,7 @@ public abstract class JDBC {
         String q = "SELECT Customer_ID, Customer_Name, Address, Postal_Code, first_level_divisions.Division, " +
                 "first_level_divisions.Division_ID, countries.Country, countries.Country_ID, Phone FROM customers " +
                 "JOIN first_level_divisions ON first_level_divisions.Division_ID = customers.Division_ID JOIN countries " +
-                "ON first_level_divisions.Country_ID = countries.Country_ID;";
+                "ON first_level_divisions.Country_ID = countries.Country_ID ORDER BY Customer_ID;";
         ResultSet rs = statement.executeQuery(q);
         while(rs.next()){
             Customer customer =  new Customer(rs.getInt("Customer_ID"),rs.getString("Customer_Name"),
@@ -349,14 +359,18 @@ public abstract class JDBC {
                     rs.getString("Country"),rs.getInt("Country_ID"),rs.getString("Phone"));
             list.add(customer);
         }
+        rs.close();
         return list;
     }
-    //TODO: Javadoc note
+    /**
+     * This method executes a query to pull a list of customers and their IDs as a string with a comma delimiter.
+     * @return - an Observable List of customers and their IDs as strings with a comma delimiter
+     */
     public static ObservableList<String> listOfCustomerNames() {
         ObservableList<String> list = FXCollections.observableArrayList();
         try {
             Statement statement = conn.createStatement();
-            String q = "SELECT Customer_Name, Customer_ID FROM client_schedule.customers;";
+            String q = "SELECT Customer_Name, Customer_ID FROM client_schedule.customers ORDER BY Customer_ID;";
             ResultSet rs = statement.executeQuery(q);
             while (rs.next()) {
                 String customer = rs.getString("Customer_Name")+", "+rs.getInt("Customer_ID");
@@ -368,7 +382,15 @@ public abstract class JDBC {
         }
         return list;
     }
-    //TODO: Javadoc note
+    /**
+     * This method executes an update statement to add a new customer.
+     * @param name - customer name
+     * @param address - customer address
+     * @param postalCode - customer postal code
+     * @param phone - customer phone
+     * @param division - customer division
+     * @return - a boolean indicating if the customer was added successfully
+     */
     public static boolean addNewCustomer(String name, String address, String postalCode, String phone, int division) {
         try {
             Statement statement = conn.createStatement();
@@ -384,7 +406,16 @@ public abstract class JDBC {
         }
         return true;
     }
-    //TODO: Javadoc note
+    /**
+     * This method executes an update statement to update a customer.
+     * @param customerID - customer ID
+     * @param name - customer name
+     * @param address - customer address
+     * @param postalCode - customer postal code
+     * @param phone - customer phone
+     * @param division - customer division
+     * @return - a boolean indicating if the customer was updated successfully
+     */
     public static boolean updateCustomer(int customerID, String name, String address, String postalCode, String phone, int division) {
         try {
             Statement statement = conn.createStatement();
@@ -400,7 +431,11 @@ public abstract class JDBC {
         }
         return true;
     }
-    //TODO: Javadoc note
+    /**
+     * This method executes an update statement to delete a customer.
+     * @param customerID - customer ID
+     * @return - a boolean indicating if the customer was successfully deleted.
+     */
     public static boolean deleteCustomer(int customerID){
         try{Statement statement = conn.createStatement() ;
         String q = "DELETE FROM customers WHERE Customer_ID ="+customerID+";";
@@ -410,7 +445,11 @@ public abstract class JDBC {
         }
         return true;
     }
-    //TODO: Javadoc note
+    /**
+     * This method executes a query to check if a provided customer has any associated appointments.
+     * @param customerID - customer ID of customer to check
+     * @return - a boolean indicating if the customer has appointments
+     */
     public static boolean customerHasAppointmentsCheck(int customerID) {
         try {
             Statement statement = conn.createStatement();
@@ -419,6 +458,7 @@ public abstract class JDBC {
             if (rs.next() && rs.getInt("COUNT(*)")>0){
                 return true;
             }
+            rs.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -440,6 +480,7 @@ public abstract class JDBC {
                 String country = rs.getString("Country")+", "+rs.getInt("Country_ID");
                 list.add(country);
             }
+            rs.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -459,6 +500,7 @@ public abstract class JDBC {
                 String division = rs.getString("Division")+", "+rs.getInt("Division_ID");
                 list.add(division);
             }
+            rs.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -466,7 +508,10 @@ public abstract class JDBC {
     }
 
     // ========== Report SQL Queries ==========
-    //TODO: Javadoc note
+    /**
+     * This method executes a query for a count of appointments by type and by month for report 1.
+     * @return - an Observable List of appointments containing their type, month, and count frequency.
+     */
     public static ObservableList<Appointment> report1AppointmentsByMonthAndType() {
         ObservableList<Appointment> list = FXCollections.observableArrayList();
         try {
@@ -479,19 +524,24 @@ public abstract class JDBC {
                         rs.getInt("Appointments"));
                 list.add(appointment);
             }
+            rs.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
         return list;
     }
-    //TODO: Javadoc note
+    /**
+     * This method executes a query for the schedule of a provided contact for report 2.
+     * @param contactName - The contact name to query for their schedule
+     * @return - an Observable List of appointments for the provided contact
+     */
     public static ObservableList<Appointment> report2ScheduleByContact(String contactName){
         ObservableList<Appointment> list = FXCollections.observableArrayList();
         try{
         Statement statement = conn.createStatement() ;
         String q = "SELECT Appointment_ID, Title, Description, Location, Type, Start, End, Customer_ID, users.User_ID, " +
                     "Contact_Name FROM appointments JOIN contacts ON contacts.Contact_ID = appointments.Contact_ID JOIN " +
-                    "users ON users.User_ID = appointments.User_ID WHERE Contact_Name = \""+contactName+"\";";
+                    "users ON users.User_ID = appointments.User_ID WHERE Contact_Name = \""+contactName+"\" ORDER BY Start;";
         ResultSet rs = statement.executeQuery(q);
             while(rs.next()){
                 Appointment appointment =  new Appointment(rs.getInt("Appointment_ID"), rs.getString("Title"),
@@ -500,13 +550,17 @@ public abstract class JDBC {
                         rs.getInt("User_ID"),rs.getString("Contact_Name"));
                 list.add(appointment);
             }
+            rs.close();
         }
         catch (SQLException t) {
             t.printStackTrace();
         }
         return list;
     }
-    //TODO Javadoc note
+    /**
+     * This method executes a query for a count of customers by country and by division for report 3.
+     * @return an Observable List of customers containing their country, division, and count frequency
+     */
     public static ObservableList<Customer> report3CountCustomersByCountryAndDivision(){
         ObservableList<Customer> list = FXCollections.observableArrayList();
         try {
@@ -521,6 +575,7 @@ public abstract class JDBC {
                         rs.getInt("Count"));
                 list.add(customer);
             }
+            rs.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -542,6 +597,7 @@ public abstract class JDBC {
                 String contact =  rs.getString("Contact_Name") + ", "+rs.getInt("Contact_ID");
                 list.add(contact);
             }
+            rs.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -561,6 +617,7 @@ public abstract class JDBC {
                 String contact =  rs.getString("User_Name") + ", "+rs.getInt("User_ID");
                 list.add(contact);
             }
+            rs.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -34,14 +35,22 @@ import java.util.ResourceBundle;
  */
 public class Login implements Initializable {
     @FXML private ImageView logoImage;
+    @FXML private Label companyLabel;
+    @FXML private Label usernameLabel;
+    @FXML private Label passwordLabel;
+    @FXML private Button loginButton;
+    @FXML private Button exitButton;
     @FXML private Label errorMessage;
     @FXML private TextField userNameText;
     @FXML private TextField passwordText;
     @FXML private Label zoneIDLabel;
-    // TODO: Login displays the log-in form in English or French based on the user’s computer language setting
+    private String errorMissingField;
+    private String errorWrongUsernamePassword;
+    private String errorSQLException;
 
     /**
-     * This method initializes the controller and populates the zoneID label.
+     * This method initializes the controller, populates the text to be in English or French based on the computer
+     * language settings and populates the zoneID label.
      * @param url - possible url location for root object if provided, null if not needed.
      * @param resourceBundle - possible resources for root object, null if not needed.
      */
@@ -49,11 +58,19 @@ public class Login implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         zoneIDLabel.setText(ZoneId.systemDefault().toString());
         try{
-            Image logo = new Image(new FileInputStream("src\\Resource\\FGCLogo.jpg"));
+            Image logo = new Image(new FileInputStream("src\\Resources\\FGCLogo.jpg"));
             logoImage.setImage(logo);
         } catch (FileNotFoundException e) {
             System.out.println("logo image in resource file has been moved or renamed");
         }
+        companyLabel.setText(resourceBundle.getString("companyName"));
+        usernameLabel.setText(resourceBundle.getString("username"));
+        passwordLabel.setText(resourceBundle.getString("password"));
+        loginButton.setText(resourceBundle.getString("loginButton"));
+        exitButton.setText(resourceBundle.getString("exitButton"));
+        errorMissingField = resourceBundle.getString("errorMissingField");
+        errorWrongUsernamePassword = resourceBundle.getString("errorWrongUsernamePassword");
+        errorSQLException = resourceBundle.getString("errorSQLException");
     }
     /**
      * This method validates a user's attempt at logging in to the application. An error message is displayed if a
@@ -64,7 +81,7 @@ public class Login implements Initializable {
      */
     private boolean loginValidation(){
         if(userNameText.getText().isEmpty() || passwordText.getText().isEmpty()){
-            displayError("Please fill in both username and password fields");
+            displayError(errorMissingField);
             return false;
         }
         try{
@@ -73,12 +90,12 @@ public class Login implements Initializable {
                 return true;
             }
             else{
-                displayError("Username and password are incorrect. Please try again.");
+                displayError(errorWrongUsernamePassword);
                 SessionData.recordLoginAttempt(userNameText.getText(),false);
                 return false;
             }
         } catch (SQLException throwables) {
-            displayError("SQL exception: please make sure database is connected.");
+            displayError(errorSQLException);
             throwables.printStackTrace();
             return false;
         }

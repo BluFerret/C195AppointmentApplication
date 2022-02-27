@@ -27,7 +27,9 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import static java.time.LocalDate.now;
 
-// TODO:Javadoc note
+/**
+ * This is the controller class for AppointmentView.fxml. This provides the fields to update or add a new appointment.
+ */
 public class AppointmentView implements Initializable {
     @FXML private Label errorMessage;
     @FXML private TextField appIDText;
@@ -44,7 +46,13 @@ public class AppointmentView implements Initializable {
     private static Appointment currentAppointment;
     private static boolean modifyAppointment = false;
 
-    //TODO:javadoc ... lambdas used for "for each"
+    /**
+     * This method initializes the AppointmentView of the application by populating textviews and comboboxes
+     * accordingly depending on if the appointment is new or being updated. Lambdas for the forEach method are used to
+     * shorten code when updating certain fields from a list.
+     * @param url - possible url location for root object if provided, null if not needed.
+     * @param resourceBundle - possible resources for root object, null if not needed.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ObservableList<String> customerList = JDBC.listOfCustomerNames();
@@ -96,7 +104,13 @@ public class AppointmentView implements Initializable {
         else{
             populateDateTimeComboBoxes();}
     }
-    //TODO:javadoc
+    /**
+     * This method populates the list of start and end date and times by provided a list of times within business hours
+     * in EST with 5 minute intervals and then converting those times and dates to local time to prevent confusion
+     * for the user.
+     * @param chosenDate - date provided to generate list of business hours time for.
+     * @return - Observable list of dates and times for scheduling in the local timezone
+     */
     private ObservableList<String> listOfAppointmentTimesInLocal(String chosenDate){
         ObservableList<String> list = FXCollections.observableArrayList();
         int h = 8;
@@ -113,18 +127,28 @@ public class AppointmentView implements Initializable {
         }
         return list;
     }
-    //TODO:javadoc
+    /**
+     * This method populates the startTimeComboBox and end TimeComboBox with the dates and times provided in the
+     * listOfAppointmentTimesInLocal method.
+     */
     public void populateDateTimeComboBoxes(){
         ObservableList<String> dateTimeList = listOfAppointmentTimesInLocal(startDateBox.getValue().toString());
         startTimeComboBox.setItems(dateTimeList);
         endTimeComboBox.setItems(dateTimeList);
     }
-    //TODO:javadoc
+    /**
+     * This method indicates that an appointment is being updated instead of a new appointment being made.
+     * @param appointment - appointment being updated that is passed from ApplicationMain
+     */
     public static void setUpdateAppointment(Appointment appointment){
         currentAppointment = appointment;
         modifyAppointment = true;
     }
-    //TODO:javadoc
+    /**
+     * This method validates that the appointment fields are all provided, the end date and time is not before the
+     * start date and time, and the appointment does not conflict with another appointment for the same customer.
+     * @return - a boolean indicating if the appointment values provided are valid or not.
+     */
     private boolean validateAppointment(){
         if(titleText.getText().isEmpty()||descText.getText().isEmpty()||locationText.getText().isEmpty()||typeText.getText().isEmpty()||
                 customerBox.getValue().isEmpty()||contactBox.getValue().isEmpty()||userBox.getValue().isEmpty()||
@@ -168,7 +192,11 @@ public class AppointmentView implements Initializable {
             }
         return true;
     }
-    //TODO:javadoc
+    /**
+     * This method saves a valid appointment and returns the user to the ApplicationMain view or generates an error
+     * message if the appointment is not valid.
+     * @param e - event of clicking the save button.
+     */
     public void saveAppointment(ActionEvent e){
         if(validateAppointment()){
             boolean updated;
@@ -214,7 +242,10 @@ public class AppointmentView implements Initializable {
         visibleErrorText.setOnFinished(actionEvent -> errorMessage.setVisible(false));
         visibleErrorText.play();
     }
-    //TODO:javadoc
+    /**
+     * This method returns the user to the ApplicationMain view.
+     * @param e - event of clicking the cancel button.
+     */
     public void cancelButtonAction(ActionEvent e) {
         modifyAppointment=false;
         Parent root = null;
