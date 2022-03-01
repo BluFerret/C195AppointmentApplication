@@ -46,7 +46,7 @@ public abstract class SessionData {
             String format = "yyyy-MM-dd HH:mm:ss";
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
             String timestamp = LocalDateTime.now(ZoneId.of("UTC")).format(formatter);
-            FileWriter writer = new FileWriter("login_logs.txt",true);
+            FileWriter writer = new FileWriter("login_activity.txt",true);
             writer.write(userName+","+timestamp+" UTC,"+successfulLogin+",");
             writer.close();
         } catch (IOException e) {
@@ -61,12 +61,12 @@ public abstract class SessionData {
         return loginAttempts;
     }
     /**
-     * This method is the setter for the login attempt list as pulled from the login_logs text document
+     * This method is the setter for the login attempt list as pulled from the login_activity text document
      */
     private static void setLoginAttempts(){
         loginAttempts = FXCollections.observableArrayList();
         try {
-            Scanner read = new Scanner(new File("login_logs.txt"));
+            Scanner read = new Scanner(new File("login_activity.txt"));
             read.useDelimiter(",");
             while (read.hasNext()) {
                 String userName = read.next();

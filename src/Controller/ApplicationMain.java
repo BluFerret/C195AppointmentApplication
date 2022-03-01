@@ -340,7 +340,8 @@ public class ApplicationMain implements Initializable {
         }
     }
     /**
-     * This method gives the user an option to delete an appointment via a pop-up message.
+     * This method gives the user an option to delete an appointment via a pop-up message. A lambda expression is used
+     * for the filter method to both make code more concise as it filters the Observable List collection of customerList.
      */
     public void deleteAppointment(){
         if(appointmentTableView.getSelectionModel().isEmpty()){
@@ -435,7 +436,8 @@ public class ApplicationMain implements Initializable {
     // ========== application exit and error display ==========
     /**
      * Method to display error message to user. Lambda used for setOnFinished of PauseTransition to return error text
-     * to be invisible after 10 seconds.
+     * to be invisible after 10 seconds. The use of this lambda on the setOnFinished method is to keep the code
+     * readable and concise.
      * @param s- String containing error message to be displayed to the user.
      */
     private void displayError(String s){

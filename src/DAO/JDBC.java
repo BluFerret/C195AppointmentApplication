@@ -487,7 +487,8 @@ public abstract class JDBC {
         return list;
     }
     /**
-     *This method executes a query to pull a list of all first level divisions and their IDs
+     *This method executes a query to pull a list of all first level divisions and their IDs for a provided country.
+     * @param countryID - country ID to identify provided country
      * @return an ObservableList containing all first level divisions and their IDs.
      */
     public static ObservableList<String> listOfFirstLvlDivisions(String countryID){
