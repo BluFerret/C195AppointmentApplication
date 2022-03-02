@@ -82,7 +82,7 @@ public abstract class SessionData {
     }
     // ========== Time Conversion ==========
     /**
-     * This method coverts UTC date and time as a string to local date and time as a string.
+     * This method converts UTC date and time as a string to local date and time as a string.
      * Local time is the local time of the JVM.
      * @param dateAndTimeUTC - a string containing the date and time in UTC timezone
      * @return a string containing the date and time provided but converted to the local timezone
@@ -98,7 +98,7 @@ public abstract class SessionData {
         return convertedTime.format(formatter);
     }
     /**
-     * This method coverts local date and time as a string to UTC date and time as a string.
+     * This method converts local date and time as a string to UTC date and time as a string.
      * Local time is the local time of the JVM.
      * @param dateAndTimeLocal - a string containing the date and time in local timezone
      * @return a string containing the date and time provided but converted to UTC timezone
@@ -114,7 +114,7 @@ public abstract class SessionData {
         return convertedTime.format(formatter);
     }
     /**
-     * This method coverts EST date and time as a string to local date and time as a string.
+     * This method converts EST date and time as a string to local date and time as a string.
      * Local time is the local time of the JVM.
      * @param dateAndTimeEST - a string containing the date and time in EST timezone
      * @return a string containing the date and time provided but converted to local timezone

@@ -47,7 +47,7 @@ public abstract class JDBC {
         }
     }
     /**
-     * This method checks the provided username and password verses the usernames and associated passwords in the database.
+     * This method checks the provided username and password against the usernames and associated passwords in the database.
      * @param usernameAttempt - the username provided by the user on the login form
      * @param passwordAttempt - the password provided by the user on the login form
      * @return a boolean pertaining to the validity of the username and associated password provided by the user

@@ -49,9 +49,9 @@ public class AppointmentView implements Initializable {
     /**
      * This method initializes the AppointmentView of the application by populating textviews and comboboxes
      * accordingly depending on if the appointment is new or being updated. Lambdas for the forEach method are used to
-     * keep code concise and easier to read. These for each and lambda combinations are used for updating most of the
-     * fields from their respective collection lists when an appointment is being modified instead of creating a
-     * new appointment.
+     * keep code concise and easier to read. The combination of the lambda and the forEach method dramatically cut
+     * down on the code needed to process and perform an action on a collection. In this case, the collection is being
+     * compared to other values to determine the default value of some fields.
      * @param url - possible url location for root object if provided, null if not needed.
      * @param resourceBundle - possible resources for root object, null if not needed.
      */
@@ -233,9 +233,10 @@ public class AppointmentView implements Initializable {
         }
     }
     /**
-     * Method to display error message to user. Lambda used for setOnFinished of PauseTransition to return error text
-     * to be invisible after 10 seconds. The use of this lambda on the setOnFinished method is to keep the code
-     * readable and concise.
+     * This Method displays an error message to user. A Lambda expression is used for setOnFinished of PauseTransition
+     * to return error text to be invisible after 10 seconds. The use of this lambda on the setOnFinished method is
+     * to keep the code readable and concise. This uses the abstract method setOnFinished and sets the textView
+     * to become invisible once the previously entered PauseTransition is finished with the assigned duration of 10 seconds.
      * @param s- String containing error message to be displayed to the user.
      */
     private void displayError(String s){

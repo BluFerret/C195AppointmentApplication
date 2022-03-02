@@ -33,7 +33,8 @@ import java.util.ResourceBundle;
  * offers ways for the user to create, update, and delete appointments as well as view appointments by month and
  * week or by all time. The Customer tab displays all the customers and allows the user to create, update, and
  * delete customers. The report 1 tab displays the count of appointments groups by type and by month. The report 2 tab
- * displays a schedule of appointments for each contact. The report 3 tab displays _________________________________.
+ * displays a schedule of appointments for each contact. The report 3 tab displays the count of customers by country
+ * and division.
  * The logs tab displays all login attempts, when they took place, and if they were successful.
  */
 public class ApplicationMain implements Initializable {
@@ -341,7 +342,12 @@ public class ApplicationMain implements Initializable {
     }
     /**
      * This method gives the user an option to delete an appointment via a pop-up message. A lambda expression is used
-     * for the filter method to both make code more concise as it filters the Observable List collection of customerList.
+     * for the filter method of the Stream API to make code more concise as it filters the Observable List collection
+     * of customerList. Also, by using lambda with Stream API, the efficiency of the statement is increased which could
+     * speed up processing of collections as the collection size grows. This particular use of a lambda expression and
+     * the filter method is finding the customer, from the list of customers, who is associated with the appointment
+     * proposed for deletion. Because the Appointment model only holds the customer's ID number, the ID number is
+     * used to filter the customerList for the corresponding customer.
      */
     public void deleteAppointment(){
         if(appointmentTableView.getSelectionModel().isEmpty()){
@@ -435,9 +441,10 @@ public class ApplicationMain implements Initializable {
 
     // ========== application exit and error display ==========
     /**
-     * Method to display error message to user. Lambda used for setOnFinished of PauseTransition to return error text
-     * to be invisible after 10 seconds. The use of this lambda on the setOnFinished method is to keep the code
-     * readable and concise.
+     * This Method displays an error message to user. A Lambda expression is used for setOnFinished of PauseTransition
+     * to return error text to be invisible after 10 seconds. The use of this lambda on the setOnFinished method is
+     * to keep the code readable and concise. This uses the abstract method setOnFinished and sets the textView
+     * to become invisible once the previously entered PauseTransition is finished with the assigned duration of 10 seconds.
      * @param s- String containing error message to be displayed to the user.
      */
     private void displayError(String s){
