@@ -12,8 +12,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * This is an appointment scheduling application for a fictional global consulting company. This project is for
- * WGU Course C195 created by Lindsey Hill, student ID: #001994073.
+ * This is an appointment scheduling application for a fictional global consulting company.
  *
  * @author  Lindsey Hill
  */
